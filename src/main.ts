@@ -17,10 +17,11 @@ const calendar = new TimelyX({
     handleEvents:true,
     tHeaderOption:{
         currentMonthFormat:"MMMM yyyy",
-        dayFormat:"EEE"
+        dayFormat:"ccc"
     }
 });
 calendar.mount("#timely-calendar");
+
 calendar.addEvent({
     title: "Team Meeting",
     start_date: "2024-10-21T02:00:00Z",
@@ -28,6 +29,7 @@ calendar.addEvent({
     location: "Conference Room A",
     description: "Discuss project updates and deadlines.",
     allDay: false,
+   
     attendees: ["alice@example.com", "bob@example.com"]
 });
 calendar.addEvent({
@@ -45,6 +47,7 @@ calendar.addEvent({
     end_date: "2024-10-20T16:30:00Z",
     location: "Conference Room A",
     description: "Discuss project updates and deadlines.",
+    recurrence:"RRULE:FREQ=WEEKLY;WKST=MO;BYDAY=TU",
     allDay: false,
     attendees: ["alice@example.com", "bob@example.com"]
 });
@@ -82,7 +85,6 @@ calendar.onDayClicked = (date, events) => {
     //console.log(date, events);
 }
 calendar.onTEventClicked = (event) => {
-    console.log(event);
     
 }
 console.log(calendar);

@@ -554,6 +554,15 @@ video {
   display: none;
 }
 
+/* Define --main-bg-color here */
+
+:root {
+  --tyx-primary-color: #6B5AED;
+  --tyx-calendar-bg-color: white;
+  --tyx-header-bg-color: white;
+  --tyx-calendar-radius: 8px;
+}
+
 /* General styles */
 
 body {
@@ -564,8 +573,8 @@ body {
 }
 
 .calendar {
-  background-color: white;
-  border-radius: 8px;
+  background-color: var(--tyx-calendar-bg-color);
+  border-radius: var(--tyx-calendar-radius);
   box-shadow: 0 2px 2px rgba(0, 0, 0, 0.05);
   overflow: hidden;
   position: relative;
@@ -575,9 +584,6 @@ body {
   /* For fade effect */
   display: flex;
   flex-direction: column;
-}
-
-.calendar.small-grid{
   height: 100%;
 }
 
@@ -588,6 +594,7 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 10px 20px;
+  background-color: var(--tyx-header-bg-color);
 }
 
 .calendar-header h2 {
@@ -599,9 +606,11 @@ body {
 .prev-month, .next-month {
   background: none;
   border: none;
-  font-size: 20px;
+  font-size: 15px;
   cursor: pointer;
   transition: color 0.3s;
+  padding: 5px;
+  border-radius: 50%;
 }
 
 .prev-month:hover, .next-month:hover {
@@ -635,6 +644,11 @@ body {
   /* Slide in */
   transform: scale(1);
   /* Back to normal size */
+}
+
+.calendar .calendar-content{
+  flex-grow: 2;
+  overflow-y: scroll;
 }
 
 .calendar.small-grid .calendar-grid{
@@ -692,6 +706,13 @@ body {
   position: relative;
   font-size: 13px;
   padding: 5px;
+  margin: 2px;
+}
+
+.date-cell.today{
+  background-color: var(--tyx-primary-color);
+  color: white;
+  border-radius: var(--tyx-calendar-radius);
 }
 
 .date-cell.previous-date {
@@ -704,6 +725,8 @@ body {
 
 .date-cell:hover {
   background-color: #f0f0f0;
+  color: inherit;
+  border-radius: var(--tyx-calendar-radius);
 }
 
 .date-cell ul {
@@ -713,7 +736,11 @@ body {
 }
 
 .date-cell.selected-date{
+  border-color: var(--tyx-primary-color);
+  border-width: 2px;
   background-color: #f0f0f0;
+  border-radius: var(--tyx-calendar-radius);
+  color: inherit;
 }
 
 /* Event item styles */
@@ -756,8 +783,8 @@ body {
   font-size: 10px;
   color: white;
   padding: 1px;
-  background-color: #6B5AED;
-  border-radius: 8px;
+  background-color: var(--tyx-primary-color);
+  border-radius: var(--tyx-calendar-radius);
 }
 
 /* Responsive styles */
@@ -781,7 +808,7 @@ body {
   }
 
   .event-list-large .event-marker{
-    background-color: #6B5AED;
+    background-color: var(--tyx-primary-color);
     height: 5px;
     width: 5px;
     border-radius: 50%;
@@ -809,8 +836,8 @@ body {
   /* Individual event item styles */
 
   .event-list .event-item {
-    background-color: #6B5AED;
-    border-radius: 8px;
+    background-color: var(--tyx-primary-color);
+    border-radius: var(--tyx-calendar-radius);
     padding: 10px;
     color: #ffffff;
     /* White text */

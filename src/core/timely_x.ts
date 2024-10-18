@@ -1,6 +1,7 @@
 import { DateTime } from 'ts-luxon';
 import { TEvent } from './types/t_event';
 import { THeaderOption } from './types/t_header_option';
+import { rrulestr } from 'rrule';
 
 type TimelyXView = "month" | "week" | "day";
 
@@ -13,6 +14,7 @@ export class TimelyX {
     language: string;
     daysOfWeek: string[];
     events: { [key: string]: TEvent[] }; // Event storage
+    eventInstances: { [key: string]: TEvent[] }; // Event storage
     view: TimelyXView; // Current view
     tHeaderOption: THeaderOption;
     handleEvents:boolean;
@@ -34,6 +36,7 @@ export class TimelyX {
         this.handleEvents = handleEvents;
         
         this.events = {};
+        this.eventInstances = {};
         this.view = view as TimelyXView;
         this.tHeaderOption = {
              currentMonthFormat:'MMMM yyyy',
@@ -92,12 +95,19 @@ export class TimelyX {
 
     _render(delta?: number) {
         
+        // update events list with all recurring event
+        this._updateEventInstances();
+        
         // Clear previous content
         this.instance!.innerHTML = '';
             
         // Create calendar header
         const headerDiv = this._createHeader();
         this.instance?.appendChild(headerDiv);
+
+        const calendarContent = document.createElement('div');
+        calendarContent.className = 'calendar-content';
+        this.instance?.appendChild(calendarContent);
 
         // Render the calendar grid
         const gridDiv = document.createElement('div');
@@ -116,8 +126,9 @@ export class TimelyX {
         if(delta){
             gridDiv.classList.add(delta < 0 ? 'direction-left' : 'direction-right');
         }
+        calendarContent.appendChild(gridDiv);
 
-        this.instance?.appendChild(gridDiv);
+        this.instance?.appendChild(calendarContent);
 
         this._renderEventLists()
 
@@ -194,14 +205,14 @@ export class TimelyX {
 
         if(this.selectedDate==undefined) return
         const eventDate =this.selectedDate.toISODate();
-        const eventList = this.events[eventDate] || []
+        const eventList = this.eventInstances[eventDate] || []
         eventList.forEach(tevent => {
             const eventItem = document.createElement('div');
             eventItem.className = 'event-item';
 
             const eventTitle = document.createElement('div');
             eventTitle.className = 'event-title';
-            eventTitle.innerText = tevent.title;
+            eventTitle.innerText = `${tevent.title}${tevent.recurrence?'🔁':''}`;
             eventItem.appendChild(eventTitle);
 
             const eventTime = document.createElement('div');
@@ -211,7 +222,8 @@ export class TimelyX {
             eventItem.addEventListener('click', () => this._handleTEventClick(tevent));
             eventListDiv.appendChild(eventItem);
         })
-        this.instance?.appendChild(eventListDiv);
+        const calendarContent = document.querySelector('.calendar-content') as HTMLElement
+        calendarContent.appendChild(eventListDiv);
     }
 
     _renderWeekView(gridDiv: HTMLElement) {
@@ -249,9 +261,14 @@ export class TimelyX {
 
     _createDateCell({ date, isPrevious, isNext }: { date?: DateTime; isPrevious: boolean; isNext: boolean }): HTMLElement {
         const dateCell = document.createElement('div');
-        const isCurrentDate = date && date.toISODate() === this.selectedDate?.toISODate();
-        dateCell.className = `date-cell ${isPrevious ? 'previous-date' : ''} ${isNext ? 'next-date' : ''} ${(isCurrentDate) ? 'selected-date' : ''}`; // Add class for next dates
+        const isSelectedDate = date && date.toISODate() === this.selectedDate?.toISODate();
+        dateCell.className = `date-cell ${isPrevious ? 'previous-date' : ''} ${isNext ? 'next-date' : ''} ${(isSelectedDate) ? 'selected-date' : ''}`; // Add class for next dates
         
+        const today = DateTime.now().setZone(this.timezone).startOf('day');
+        const isTodayDate = date && date.toISODate() === today.toISODate();
+        if(isTodayDate){
+            dateCell.classList.add('today');
+        }
         dateCell.setAttribute("data",date ? date.toISODate() : '');
         dateCell.setAttribute("day",date ? date.toFormat('ccc') : '');
         dateCell.addEventListener('click', () => this._handleDateClick(date));
@@ -335,7 +352,7 @@ export class TimelyX {
             this.selectedDate = date;
             document.querySelector(`[data="${date.toISODate()}"]`)?.classList.add('selected-date');
             this._renderEventLists();
-            this.onDayClicked?.call(this, date, this.events[date.toISODate()] || []);
+            this.onDayClicked?.call(this, date, this.eventInstances[date.toISODate()] || []);
             // Optionally display events or open a detailed view
         }
     }
@@ -346,7 +363,7 @@ export class TimelyX {
     _populateEventDetails(date: DateTime | undefined, cell: HTMLElement) {
         if (!date) return;
         const dateString = date.toISODate();
-        const eventList = this.events[dateString] || [];
+        const eventList = this.eventInstances[dateString] || [];
         if(eventList.length>0){
             const eventsElement = document.createElement('div');
             eventsElement.classList.add('event-list-large');
@@ -354,7 +371,6 @@ export class TimelyX {
                 const eventItem = document.createElement('div');
                 eventItem.className = 'event-item';
                 eventItem.addEventListener('click', () => this._handleTEventClick(event));
-
                 const eventDetails = document.createElement('div');
                 eventDetails.className = 'event-details';
                 eventItem.appendChild(eventDetails);
@@ -381,11 +397,53 @@ export class TimelyX {
         
     }
 
+    _updateEventInstances(){
+        this.eventInstances = {};
+        const flatennedEvents = Object.values(this.events).flatMap((events) => events);
+        for (const event of flatennedEvents) {
+            if(!event.recurrence){
+                this.addEventInstance(event, this.eventInstances);
+            }else{
+                // Parse the recurrence rule using rrule
+                const rule = rrulestr(event.recurrence);
+                // Expand recurrence dates within the range of startDate to endDate
+                const rruleDates = rule.between(this.startDate.toJSDate(), this.endDate.toJSDate(), true);
+                // Convert rruleDates to DateTime and push to recurrenceDates array
+                const recurrenceDates = rruleDates.map(date => DateTime.fromJSDate(date).setZone(this.timezone));
+                recurrenceDates.forEach(date => {
+                    var start = DateTime.fromISO(event.start_date).setZone(this.timezone);
+                    var newStart = DateTime.fromObject({ year: date.year, month: date.month, day: date.day,hour: start.hour, minute: start.minute })
+                    var end = DateTime.fromISO(event.end_date).setZone(this.timezone);
+                    var  duration = end.diff(start, 'minutes');
+                    var newEvent =  {
+                        start_date: newStart.toISO(),
+                        end_date: newStart.plus(duration).toISO(),
+                        title: event.title,
+                        location: event.location,
+                        description: event.description,
+                        attendees: event.attendees,
+                        allDay: event.allDay,
+                        recurrence: event.recurrence,
+                    } as TEvent
+                    
+                    this.addEventInstance(newEvent, this.eventInstances);
+                })
+            }
+        }
+
+    }
+
    
-
-
     addEvent(event: TEvent) {
-        const startDate = DateTime.fromISO(event.start_date).setZone(this.timezone);
+        
+        this.addEventInstance(event,this.events)
+        this._render();
+    }
+
+    addEventInstance(event: TEvent,events: {
+        [key: string]: TEvent[];
+    }) {
+    const startDate = DateTime.fromISO(event.start_date).setZone(this.timezone);
     const endDate = DateTime.fromISO(event.end_date).setZone(this.timezone);
 
     let currentDate = startDate.startOf('day');  // Begin at the start of the day for the start_date
@@ -394,8 +452,8 @@ export class TimelyX {
         const eventDate = currentDate.toISODate();
 
         // Initialize the event array for the current date if not already initialized
-        if (!this.events[eventDate]) {
-            this.events[eventDate] = [];
+        if (!events[eventDate]) {
+            events[eventDate] = [];
         }
 
         // Determine the event's start and end times for the current day
@@ -403,20 +461,18 @@ export class TimelyX {
         let eventEnd = currentDate.equals(endDate.startOf('day')) ? endDate : currentDate.endOf('day');
 
         // Push the adjusted event for the current day
-        this.events[eventDate].push({
+        events[eventDate].push({
             ...event,
             start_date: eventStart.toISO(),  // Adjusted start date for this segment
             end_date: eventEnd.toISO()       // Adjusted end date for this segment
         });
 
         // Sort events by start_date after adding the new event
-        this.events[eventDate].sort((a, b) => DateTime.fromISO(a.start_date).toMillis() - DateTime.fromISO(b.start_date).toMillis());
+        events[eventDate].sort((a, b) => DateTime.fromISO(a.start_date).toMillis() - DateTime.fromISO(b.start_date).toMillis());
 
 
         // Move to the next day
         currentDate = currentDate.plus({ days: 1 });
     }
-
-    this._render();
     }
 }
