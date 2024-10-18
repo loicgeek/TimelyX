@@ -1,0 +1,256 @@
+@import "tailwindcss/base";
+
+@import "tailwindcss/components";
+
+@import "tailwindcss/utilities";
+
+
+/* General styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    margin: 0;
+    padding: 20px;
+}
+
+.calendar {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    position: relative;
+    transition: transform 0.5s ease, opacity 0.5s ease; /* Smooth transition effect */
+    opacity: 1; /* For fade effect */
+    display: flex;
+    flex-direction: column;
+}
+.calendar.small-grid{
+    height: 100%;
+}
+
+
+/* Header styles */
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+}
+
+.calendar-header h2 {
+    margin: 0;
+}
+
+/* Navigation buttons */
+.prev-month, .next-month {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.prev-month:hover, .next-month:hover {
+    color: #d1c4f8;
+}
+
+/* Grid styles */
+.calendar-grid  {
+    flex-grow: 1;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    transform: scale(1); /* Normal scale */
+}
+
+.calendar-grid.fade-out.direction-right {
+    opacity: 0;
+    transform: translateX(20px); /* Slide out up */
+}
+.calendar-grid.fade-out.direction-left {
+    opacity: 0;
+    transform: translateX(-20px); /* Slide out up */
+}
+
+.calendar-grid.fade-in {
+    opacity: 1;
+    transform: translateY(0); /* Slide in */
+    transform: scale(1); /* Back to normal size */
+}
+.calendar.small-grid .calendar-grid{
+    display: contents;
+}
+.calendar.large-grid .calendar-grid .events-list{
+    display: none;
+}
+.calendar-grid .week-header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+}
+.calendar.large-grid .calendar-grid .week-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr); /* 7 equal columns */
+    grid-template-rows: repeat(6, 1fr);    /* 6 equal rows */
+    gap: 1px;
+    width: 100%;    /* Grid takes up the full available width */
+    height: 100%;   /* Grid takes up the full available height */
+    border-top: 1px solid #ddd;
+}
+.calendar.small-grid .calendar-grid .week-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    border-top: 1px solid #ddd;
+    
+}
+
+/* Day header styles */
+.week-header {
+    display: flex;
+}
+
+.day-header {
+    font-size: 13px;
+    padding: 10px;
+    text-align: center;
+    font-weight: 500;
+}
+
+/* Date cell styles */
+.date-cell {
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    position: relative;
+    font-size: 13px;
+    padding: 5px;
+}
+.date-cell.previous-date {
+    color: #999;
+}
+.date-cell.next-date {
+    color: #999;
+}
+
+.date-cell:hover {
+    background-color: #f0f0f0;
+}
+
+.date-cell ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+.date-cell.selected-date{
+    background-color: #f0f0f0;
+}
+
+/* Event item styles */
+.event-location, .event-description {
+    font-size: 12px;
+    color: #666;
+}
+
+
+/* Day details styles */
+.day-details {
+    padding: 20px;
+    border-top: 1px solid #ddd;
+}
+
+
+.calendar.large-grid .date-cell{
+    min-height: 80px;
+}
+.calendar.large-grid .event-list{
+    display: none;
+}
+
+
+.calendar.large-grid .event-list .event-item .event-time{
+    display: none;
+}
+.calendar.large-grid .event-list-large{
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.calendar.large-grid .event-list-large .event-time{
+    display: none;
+}
+.calendar.large-grid .event-list-large .event-title{
+    font-size: 10px;
+    color: white;
+    padding: 1px;
+    background-color: #6B5AED;
+    border-radius: 8px;
+}
+
+/* Responsive styles */
+@media (max-width: 600px) {
+    .date-cell{
+        min-height: 53px; /* Set minimum height for consistency */
+    }
+    
+
+
+    /* Design for event list */
+    .event-list-large{
+        display: flex;
+        gap: 2px;
+        justify-content: center;
+    }
+    .event-list-large .event-details{
+        display: none;
+    }
+    .event-list-large .event-marker{
+        background-color: #6B5AED;
+        height: 5px;
+        width: 5px;
+        border-radius: 50%;
+    }
+
+
+    .event-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px; /* Space between events */
+        margin: 5px 0;
+        padding: 5px 5px;
+        flex-grow: 2;
+        overflow-y: scroll;
+    
+    }
+    
+    /* Title of each event */
+    .event-list .event-item .event-title {
+        font-size: 15px;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+     /* Individual event item styles */
+     .event-list .event-item {
+        background-color: #6B5AED;
+         border-radius: 8px;
+         padding: 10px;
+         color: #ffffff; /* White text */
+         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+         display: flex;
+         flex-direction: column;
+     }
+    
+     /* Event time information */
+     .event-list .event-item .event-time {
+        display: none;
+         font-size: 12px;
+         color: rgba(255, 255, 255, 0.8); /* Slightly lighter text for time */
+         display: flex;
+         align-items: center;
+     }
+    
+     /* Icon styles */
+     .event-list .event-item .event-time::before {
+         content: "⏰"; /* Optional: Add an icon similar to the one in the screenshot */
+         margin-right: 5px;
+     }
+
+    /* Container for the event list */
+
+}
