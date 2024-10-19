@@ -13,7 +13,7 @@ const events : TEvent[] = [
 const calendar = new TimelyX({
     timezone:"America/New_York",
     language:"en",
-    view:'month',
+    view:'week',
     handleEvents:true,
     tHeaderOption:{
         currentMonthFormat:"MMMM yyyy",

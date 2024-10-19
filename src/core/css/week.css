@@ -1,0 +1,59 @@
+.calendar.week .calendar-content{
+    overflow-y: hidden;
+}
+.calendar.week .calendar-grid{
+    overflow-y: scroll;
+    height: 100%;
+    
+}
+.tyx__week-header{
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    padding: 5px;
+    padding-left: var(--tyx-calendar-week-grid-padding-left);
+}
+.tyx__week-grid{
+    display: flex;
+    height:var(--tyx-calendar-week-grid-height);
+    overflow: hidden;
+    position: relative;
+    padding-left: var(--tyx-calendar-week-grid-padding-left);
+    padding-top: var(--tyx-calendar-week-grid-padding-top);
+ 
+}
+.tyx__week-grid .tyx__week-grid__time-axis{
+    display: flex;
+    flex-flow: column;
+    position: absolute;
+    right: 0;
+    padding-left:var(--tyx-calendar-week-grid-padding-left);
+    width: calc(100%);
+    /* margin-bottom: 50px;
+    margin-top: 30px; */
+}
+.tyx__week-grid .tyx__week-grid__time{
+    height: var(--tyx-calendar-week-grid-slot-height);
+    border-top: 1px solid #f0f0f0;
+    position: relative;
+    cursor: pointer;
+}
+.tyx__week-grid .tyx__week-grid__time:last-of-type{
+    border-bottom: 1px solid #f0f0f0;
+}
+.tyx__week-grid .tyx__week-grid__time-text{
+   position: absolute;
+   left: calc(var(--tyx-calendar-week-grid-padding-left) * -.75);
+   top: -10px;
+   font-size: 12px;
+   color: #a9a2a2;
+}
+
+.tyx__week-grid .tyx__week-grid__day{
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-left: 1px solid #f0f0f0;
+}
+.tyx__week-grid .tyx__week-grid__day .tyx__week-grid__day-event{
+    position: absolute;
+}

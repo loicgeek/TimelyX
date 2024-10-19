@@ -1,4 +1,4 @@
-import { DateTime } from 'ts-luxon';
+import { DateTime, Duration } from 'ts-luxon';
 import { TEvent } from './types/t_event';
 import { THeaderOption } from './types/t_header_option';
 import { rrulestr } from 'rrule';
@@ -45,9 +45,8 @@ export class TimelyX {
         };
         this.selectedDate = DateTime.fromISO(selectedDate).setZone(this.timezone);
 
-        this.startDate = this.selectedDate.startOf('month');
-        this.endDate = this.selectedDate.endOf('month');
-
+        this.startDate = this.selectedDate.startOf(view.toString() as 'month' | 'week' | 'day');
+        this.endDate = this.selectedDate.endOf(view.toString() as 'month' | 'week' | 'day');
         this.daysOfWeek = this._getDayHeaders();
         
     }
@@ -168,9 +167,12 @@ export class TimelyX {
     }
 
     _renderMonthView(gridDiv: HTMLElement) {
+
+        this._removeViewClass();
+        document.querySelector('.calendar')?.classList.add('month');
         // Create a container for the week headers
         const weekHeaderDiv = document.createElement('div');
-        weekHeaderDiv.className = 'week-header';
+        weekHeaderDiv.className = 'month-header';
 
         this.daysOfWeek.forEach(day => {
             const dayHeader = document.createElement('div');
@@ -183,7 +185,7 @@ export class TimelyX {
 
         const dates = this._getDatesForMonth();
         const weekDiv = document.createElement('div');
-        weekDiv.className = 'week-grid'; // Create a div for week grid to hold the dates
+        weekDiv.className = 'month-grid'; // Create a div for week grid to hold the dates
 
         dates.forEach(({ date, isPrevious, isNext }) => {
             const dateCell = this._createDateCell({ date, isPrevious, isNext });
@@ -226,29 +228,120 @@ export class TimelyX {
         calendarContent.appendChild(eventListDiv);
     }
 
+    _removeViewClass(){
+        document.querySelector('.calendar')?.classList.remove('week');
+        document.querySelector('.calendar')?.classList.remove('month');
+    }
+
     _renderWeekView(gridDiv: HTMLElement) {
+
+        this._removeViewClass();
+        document.querySelector('.calendar')?.classList.add('week');
         const weekHeaderDiv = document.createElement('div');
-        weekHeaderDiv.className = 'week-header';
+        weekHeaderDiv.className = 'tyx__week-header';
 
         this.daysOfWeek.forEach(day => {
             const dayHeader = document.createElement('div');
-            dayHeader.className = 'day-header';
+            dayHeader.className = 'tyx__week-day-header';
             dayHeader.innerText = day;
             weekHeaderDiv.appendChild(dayHeader);
         });
 
-        gridDiv.appendChild(weekHeaderDiv); // Append day headers
+        const calendarContent = document.querySelector('.calendar-content') as HTMLElement;
+        calendarContent.appendChild(weekHeaderDiv);
+       // gridDiv.appendChild(weekHeaderDiv); // Append day headers
+
+         // generate week grid as flex row
+         const weekGrid = document.createElement('div');
+         weekGrid.className = 'tyx__week-grid';
+         
+ 
+         // add time column
+         const timeAxis = document.createElement('div');
+         timeAxis.className = 'tyx__week-grid__time-axis';
+         weekGrid.appendChild(timeAxis);
+         // generate hours
+    
+       
+        // TODO: make this as option for week view
+        const timeSlotInterval = Duration.fromObject({ hour: 1 }); // Example: 30-minute intervals
+        const startHourOfDay = DateTime.fromObject({ hour: 0 });
+        const endHourOfDay = DateTime.fromObject({ hour: 24 });
+        // Calculate the total duration between start and end in minutes
+        const totalDuration = endHourOfDay.diff(startHourOfDay, "minutes");
+        // Calculate the number of slots
+        const numberOfSlots = (totalDuration.as("minutes") / timeSlotInterval.as("minutes"))+1;
+
+        // TODO: make this as option for week view
+        const slotHeight = 100;
+
+        const tyxCalendarWeekGridHeight = numberOfSlots * slotHeight;
+        // Get the root element
+        const root = document.documentElement;
+        // Change the value of --tyx-calendar-week-grid-height
+
+        
+        root.style.setProperty('--tyx-calendar-week-grid-height', `${tyxCalendarWeekGridHeight}px`); // Set it to 1600px as an example
+        root.style.setProperty('--tyx-calendar-week-grid-slot-height', `${slotHeight}px`); // Set it to 1600px as an example
+        const tyxCalendarWeekGridPaddingTop = 15;
+        root.style.setProperty('--tyx-calendar-week-grid-padding-top', `${tyxCalendarWeekGridPaddingTop}px`); // Set it to 1600px as an example
+
+        let startHourCounter = startHourOfDay;
+        while (startHourCounter < endHourOfDay) {
+            const hourDiv = document.createElement('div');
+            hourDiv.className = 'tyx__week-grid__time';
+            hourDiv.setAttribute("time",`${startHourCounter.toFormat('HH:mm')}`);
+
+            const hourDivText = document.createElement('span');
+            hourDivText.className = 'tyx__week-grid__time-text';
+            hourDivText.innerText = `${startHourCounter.toFormat('HH:mm')}`;
+
+            hourDiv.appendChild(hourDivText);
+            timeAxis.appendChild(hourDiv);
+            startHourCounter = startHourCounter.plus(timeSlotInterval);
+        }
+
+         // add days column
 
         const weekDates = this._getDatesForWeek();
-        const weekDiv = document.createElement('div');
-        weekDiv.className = 'week-grid'; // Create a div for the week grid
-
         weekDates.forEach(date => {
-            const dateCell = this._createDateCell({ date, isPrevious: false, isNext: false }); // Default to current month dates
-            weekDiv.appendChild(dateCell);
-        });
+             const dayDivColumn = document.createElement('div');
+             dayDivColumn.className = 'tyx__week-grid__day';
+             dayDivColumn.classList.add(`tyx__${date.toFormat('EEEE').toLowerCase()}`);
+             dayDivColumn.setAttribute("data",date ? date.toISODate() : '');
+             dayDivColumn.setAttribute("day",date ? date.toFormat('ccc') : '');
+             weekGrid.appendChild(dayDivColumn);
 
-        gridDiv.appendChild(weekDiv); // Append week grid to main grid
+            const events = this.eventInstances[date.toISODate()] || [];
+            events.forEach(event => {
+
+                const eventDiv = document.createElement('div');
+                eventDiv.className = 'tyx__week-grid__day-event';
+                const start = DateTime.fromISO(event.start_date).setZone(this.timezone).setLocale(this.language);
+                const end = DateTime.fromISO(event.end_date).setZone(this.timezone).setLocale(this.language);
+                const eventDivText = document.createElement('span');
+                
+
+                // compute percentage from the top of the column, event will be displayed by absolute to value
+                const totalMinutesStart = start.diff(date.startOf("day"),'minutes').minutes;
+                const numberOfSlotsForEvent = (totalMinutesStart / (timeSlotInterval.as("minutes")));
+                const eventYPosition = slotHeight * numberOfSlotsForEvent; 
+                eventDiv.style.top = `${(eventYPosition*100/tyxCalendarWeekGridHeight) + ((tyxCalendarWeekGridPaddingTop*100)/tyxCalendarWeekGridHeight)}%`;
+                
+                eventDivText.innerText = `(${start.toFormat('HH:mm')})`;
+                eventDiv.appendChild(eventDivText);
+
+
+                dayDivColumn.appendChild(eventDiv);
+            })
+             
+        })
+        // weekDates.forEach(date => {
+        //     const dateCell = this._createDateCell({ date, isPrevious: false, isNext: false }); // Default to current month dates
+        //     weekDiv.appendChild(dateCell);
+        // });
+
+        gridDiv.appendChild(weekGrid); // Append week grid to main grid
     }
 
     _renderDayView(gridDiv: HTMLElement) {

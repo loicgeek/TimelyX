@@ -1,16 +1,16 @@
+
 @import "tailwindcss/base";
 
 @import "tailwindcss/components";
 
 @import "tailwindcss/utilities";
 
-/* Define --main-bg-color here */
-:root {
-    --tyx-primary-color: #6B5AED;
-    --tyx-calendar-bg-color: white;
-    --tyx-header-bg-color: white;
-    --tyx-calendar-radius: 8px;
-}
+@import 'base.css';
+
+@import 'week.css';
+
+
+
 
 /* General styles */
 body {
@@ -97,11 +97,11 @@ body {
 .calendar.large-grid .calendar-grid .events-list{
     display: none;
 }
-.calendar-grid .week-header {
+.calendar-grid .month-header {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
 }
-.calendar.large-grid .calendar-grid .week-grid {
+.calendar.large-grid .calendar-grid .month-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr); /* 7 equal columns */
     grid-template-rows: repeat(6, 1fr);    /* 6 equal rows */
@@ -110,7 +110,7 @@ body {
     height: 100%;   /* Grid takes up the full available height */
     border-top: 1px solid #ddd;
 }
-.calendar.small-grid .calendar-grid .week-grid {
+.calendar.small-grid .calendar-grid .month-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     border-top: 1px solid #ddd;
@@ -118,7 +118,7 @@ body {
 }
 
 /* Day header styles */
-.week-header {
+.month-header {
     display: flex;
 }
 
