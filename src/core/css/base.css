@@ -8,4 +8,5 @@
     --tyx-calendar-week-grid-padding-top: 10px;
     --tyx-calendar-week-grid-height: 1400px;
     --tyx-calendar-week-grid-slot-height: 66px; 
+    --tyx-calendar-week-event-container: hsla(var(--link-color-hsl), .1);
 }

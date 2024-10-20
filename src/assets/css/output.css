@@ -565,6 +565,7 @@ video {
   --tyx-calendar-week-grid-padding-top: 10px;
   --tyx-calendar-week-grid-height: 1400px;
   --tyx-calendar-week-grid-slot-height: 66px;
+  --tyx-calendar-week-event-container: hsla(var(--link-color-hsl), .1);
 }
 
 .calendar.week .calendar-content{
@@ -581,6 +582,24 @@ video {
   grid-template-columns: repeat(7, 1fr);
   padding: 5px;
   padding-left: var(--tyx-calendar-week-grid-padding-left);
+}
+
+.tyx__week-header .tyx__week-day-header{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  font-size: 14px;
+  gap: 5px;
+  color: #a9a2a2;
+}
+
+.tyx__week-header .tyx__week-day-header .tyx__week-day-name{
+}
+
+.tyx__week-header .tyx__week-day-header .tyx__week-day-date{
+  font-weight: 500;
+  font-size: 16px;
 }
 
 .tyx__week-grid{
@@ -622,6 +641,10 @@ video {
   color: #a9a2a2;
 }
 
+.tyx__week-grid .tyx__week-grid__time:nth-of-type(1) .tyx__week-grid__time-text{
+  top: 0;
+}
+
 .tyx__week-grid .tyx__week-grid__day{
   position: relative;
   width: 100%;
@@ -631,12 +654,23 @@ video {
 
 .tyx__week-grid .tyx__week-grid__day .tyx__week-grid__day-event{
   position: absolute;
-  background-color: var(--tyx-primary-color);
-  color: white;
   border-radius: var(--tyx-calendar-radius);
   padding: 5px;
   font-size: 12px;
   cursor: pointer;
+}
+
+.tyx__week-grid .tyx__week-grid__day .tyx__week-grid__day-event .tyx__week-grid__day-event-title{
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.tyx__week-grid .tyx__week-grid__day .tyx__week-grid__day-event .tyx__week-grid__day-event-time::before{
+  content: "⏰ ";
+}
+
+.tyx__week-grid .tyx__week-grid__day .tyx__week-grid__day-event .tyx__week-grid__day-event-location::before{
+  content: "📍 ";
 }
 
 /* General styles */

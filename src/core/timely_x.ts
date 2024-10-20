@@ -2,7 +2,9 @@ import { DateTime, Duration } from 'ts-luxon';
 import { TEvent } from './types/t_event';
 import { THeaderOption } from './types/t_header_option';
 import { rrulestr } from 'rrule';
-import { Color } from '@mirawision/colorize';
+import { ColorUtils } from './color_utils';
+import { EventUtils } from './event_utils';
+
 
 type TimelyXView = "month" | "week" | "day";
 
@@ -13,7 +15,7 @@ export class TimelyX {
     startDate: DateTime;
     endDate: DateTime;
     language: string;
-    daysOfWeek: string[];
+    daysOfWeek: Record<string,any>[];
     events: { [key: string]: TEvent[] }; // Event storage
     eventInstances: { [key: string]: TEvent[] }; // Event storage
     view: TimelyXView; // Current view
@@ -93,7 +95,7 @@ export class TimelyX {
         this._render(delta);
     }
 
-    _render(delta?: number) {
+    private _render(delta?: number) {
         
         // update events list with all recurring event
         this._updateEventInstances();
@@ -117,6 +119,7 @@ export class TimelyX {
             this._renderMonthView(gridDiv);
 
         } else if (this.view === 'week') {
+            this._renderDayHeaders();
             this._renderWeekView(gridDiv);
         } else if (this.view === 'day') {
             this._renderDayView(gridDiv);
@@ -141,7 +144,7 @@ export class TimelyX {
     }
     
 
-    _createHeader() {
+    private _createHeader() {
         const headerDiv = document.createElement('header');
         headerDiv.className = 'calendar-header';
 
@@ -167,7 +170,7 @@ export class TimelyX {
         return headerDiv;
     }
 
-    _renderMonthView(gridDiv: HTMLElement) {
+    private _renderMonthView(gridDiv: HTMLElement) {
 
         this._removeViewClass();
         document.querySelector('.calendar')?.classList.add('month');
@@ -178,7 +181,7 @@ export class TimelyX {
         this.daysOfWeek.forEach(day => {
             const dayHeader = document.createElement('div');
             dayHeader.className = 'day-header';
-            dayHeader.innerText = day;
+            dayHeader.innerText = day['dayName'];
             weekHeaderDiv.appendChild(dayHeader);
         });
 
@@ -197,7 +200,7 @@ export class TimelyX {
 
     }
 
-    _renderEventLists() {
+    private _renderEventLists() {
         if(this.view!="month" || this.handleEvents==false) return
              //append events list view
         const eventListDiv = document.querySelector('.event-list') as HTMLElement || document.createElement('div');
@@ -229,12 +232,12 @@ export class TimelyX {
         calendarContent.appendChild(eventListDiv);
     }
 
-    _removeViewClass(){
+    private _removeViewClass(){
         document.querySelector('.calendar')?.classList.remove('week');
         document.querySelector('.calendar')?.classList.remove('month');
     }
 
-    _renderWeekView(gridDiv: HTMLElement) {
+    private _renderWeekView(gridDiv: HTMLElement) {
 
         this._removeViewClass();
         document.querySelector('.calendar')?.classList.add('week');
@@ -244,7 +247,17 @@ export class TimelyX {
         this.daysOfWeek.forEach(day => {
             const dayHeader = document.createElement('div');
             dayHeader.className = 'tyx__week-day-header';
-            dayHeader.innerText = day;
+
+            const dayName = document.createElement('div');
+            dayName.className = 'tyx__week-day-name';
+            dayName.innerText = day['dayName'];
+            dayHeader.appendChild(dayName);
+
+            const dayDate = document.createElement('span');
+            dayDate.className = 'tyx__week-day-date';
+            dayDate.innerText =  (day['date'] as DateTime).day.toString();
+            dayHeader.appendChild(dayDate);
+
             weekHeaderDiv.appendChild(dayHeader);
         });
 
@@ -314,43 +327,82 @@ export class TimelyX {
              weekGrid.appendChild(dayDivColumn);
 
             const events = this.eventInstances[date.toISODate()] || [];
+
+            var eventsPercentageIntervals = events.map(e => {
+                var metadata = EventUtils.getEventMetadata(e,
+                    date,
+                    tyxCalendarWeekGridHeight,
+                    timeSlotInterval, slotHeight, 
+                    this.timezone,
+                    this.language,
+               )
+                return {
+                    start: metadata.eventStartPercentage,
+                    end: metadata.eventEndPercentage,
+                    event: e
+                }
+            })
+            if(eventsPercentageIntervals.length > 0){
+                console.log("eventsPercentageIntervals",eventsPercentageIntervals);
+            }
+            
+            
             events.forEach(event => {
 
                 const eventDiv = document.createElement('div');
                 eventDiv.className = 'tyx__week-grid__day-event';
-                const start = DateTime.fromISO(event.start_date).setZone(this.timezone).setLocale(this.language);
-                const end = DateTime.fromISO(event.end_date).setZone(this.timezone).setLocale(this.language);
-                const eventDivText = document.createElement('span');
+
+                const eventMetadata = EventUtils.getEventMetadata(event,
+                     date,
+                     tyxCalendarWeekGridHeight,
+                     timeSlotInterval, slotHeight, this.timezone,
+                     this.language,
+                );
+                eventDiv.style.top = `${eventMetadata.eventStartPercentage}%`;
+                eventDiv.style.height = `${eventMetadata.eventHeightPercentage}%`;
+
+                // start detect collision
                 
 
-                // compute percentage from the top of the column, event will be displayed by absolute to value
-                const totalMinutesStart = start.diff(date.startOf("day"),'minutes').minutes;
-                const numberOfSlotsForEvent = (totalMinutesStart / (timeSlotInterval.as("minutes")));
-                const eventYPosition = slotHeight * numberOfSlotsForEvent; 
-                eventDiv.style.top = `${(eventYPosition*100/tyxCalendarWeekGridHeight)}%`;
 
-                const eventHeight = slotHeight * (end.diff(start,'minutes').minutes / (timeSlotInterval.as("minutes")));
-                eventDiv.style.height = `${(eventHeight*100/tyxCalendarWeekGridHeight)}%`;
-                if(event.color){
-                    eventDiv.style.backgroundColor =hlsa  event.color;
+
+                // end detect collision
+
+                let color = event.color?? getComputedStyle(document.body).getPropertyValue('--tyx-primary-color')
+                // ligher color for background
+                eventDiv.style.borderLeftWidth = '5px';
+                eventDiv.style.backgroundColor = ColorUtils.generateEventBgColor(color);
+                eventDiv.style.borderLeftColor =ColorUtils.generateEventBorderColor(color);
+                eventDiv.style.color =ColorUtils.generateEventTitleColor(color);
+                
+                const eventTitleDiv = document.createElement('div');
+                eventTitleDiv.classList.add('tyx__week-grid__day-event-title')
+                eventTitleDiv.innerText = `${event.title}`
+                eventDiv.appendChild(eventTitleDiv)
+
+                const eventTimesDiv = document.createElement('div')
+                eventTimesDiv.classList.add('tyx__week-grid__day-event-time')
+                eventTimesDiv.innerText = `${eventMetadata.start.toFormat('HH:mm')} - ${eventMetadata.end.toFormat('HH:mm')}`
+                eventDiv.appendChild(eventTimesDiv)
+
+                if(event.location){
+                    const eventLocationDiv = document.createElement('div');
+                    eventLocationDiv.innerText = event.location;
+                    eventLocationDiv.classList.add('tyx__week-grid__day-event-location')
+                    eventDiv.appendChild(eventLocationDiv)
                 }
-                eventDivText.innerText = `(${start.toFormat('HH:mm')}-${end.toFormat('HH:mm')})`;
-                eventDiv.appendChild(eventDivText);
-
 
                 dayDivColumn.appendChild(eventDiv);
             })
              
         })
-        // weekDates.forEach(date => {
-        //     const dateCell = this._createDateCell({ date, isPrevious: false, isNext: false }); // Default to current month dates
-        //     weekDiv.appendChild(dateCell);
-        // });
-
         gridDiv.appendChild(weekGrid); // Append week grid to main grid
     }
+    private _renderDayHeaders(){
+        this.daysOfWeek = this._getDayHeaders();
+    }
 
-    _renderDayView(gridDiv: HTMLElement) {
+    private _renderDayView(gridDiv: HTMLElement) {
         const dayDetails = document.createElement('div');
         dayDetails.className = 'day-details';
         dayDetails.innerText = `Events for ${this.selectedDate?.toLocaleString(DateTime.DATE_FULL)}`;
@@ -358,7 +410,7 @@ export class TimelyX {
         gridDiv.appendChild(dayDetails);
     }
 
-    _createDateCell({ date, isPrevious, isNext }: { date?: DateTime; isPrevious: boolean; isNext: boolean }): HTMLElement {
+    private _createDateCell({ date, isPrevious, isNext }: { date?: DateTime; isPrevious: boolean; isNext: boolean }): HTMLElement {
         const dateCell = document.createElement('div');
         const isSelectedDate = date && date.toISODate() === this.selectedDate?.toISODate();
         dateCell.className = `date-cell ${isPrevious ? 'previous-date' : ''} ${isNext ? 'next-date' : ''} ${(isSelectedDate) ? 'selected-date' : ''}`; // Add class for next dates
@@ -381,21 +433,38 @@ export class TimelyX {
         return dateCell;
     }
 
-    _getDayHeaders() {
+    private _getDayHeaders():Record<string,any>[] {
         const days = [];
         const startDate = 1;
         const endDate = 7;
-        for (let i = startDate; i <= endDate; i++) {
-            const dayName = DateTime.local(this.startDate.year, this.startDate.month, 1,{zone:this.timezone})
-                .set({ weekday: i })
-                .setLocale(this.language)
-                .toFormat(this.tHeaderOption!.dayFormat!);
-            days.push(dayName);
+        if(this.view=="week"){
+            for (let i = 0; i <= 6; i++) {
+                const date = this.startDate.plus({ days: i });
+                const dayName = date
+                    .toFormat(this.tHeaderOption!.dayFormat!);
+                days.push({
+                    "dayName":dayName,
+                    "date":date
+                });
+            } 
+        }else{
+            for (let i = startDate; i <= endDate; i++) {
+                const date = DateTime.local(this.startDate.year, this.startDate.month, 1,{zone:this.timezone})
+                    .set({ weekday: i })
+                    .setLocale(this.language);
+                const dayName = date
+                    .toFormat(this.tHeaderOption!.dayFormat!);
+                days.push({
+                    "dayName":dayName,
+                    "date":date
+                });
+            }
         }
+       
         return days;
     }
 
-    _getDatesForMonth() {
+    private _getDatesForMonth() {
         const dates: { date: DateTime | undefined; isPrevious: boolean; isNext: boolean }[] = [];
         const firstDay = DateTime.local(this.startDate.year, this.startDate.month, 1, { zone: this.timezone });
         const lastDay = firstDay.endOf('month');
@@ -428,7 +497,7 @@ export class TimelyX {
         return dates;
     }
 
-    _getDatesForWeek() {
+    private _getDatesForWeek() {
         const weekDates: DateTime[] = [];
         const startOfWeek = this.startDate.startOf('week');
         for (let i = 0; i < 7; i++) {
@@ -437,7 +506,7 @@ export class TimelyX {
         return weekDates;
     }
 
-    _handleDateClick(date?: DateTime) {
+    private _handleDateClick(date?: DateTime) {
         if (date) {
             document.querySelector('.selected-date')?.classList.remove('selected-date');
             
@@ -455,11 +524,11 @@ export class TimelyX {
             // Optionally display events or open a detailed view
         }
     }
-    _handleTEventClick(event:TEvent) {
+    private _handleTEventClick(event:TEvent) {
         this.onTEventClicked?.call(this,event);
     }
 
-    _populateEventDetails(date: DateTime | undefined, cell: HTMLElement) {
+    private _populateEventDetails(date: DateTime | undefined, cell: HTMLElement) {
         if (!date) return;
         const dateString = date.toISODate();
         const eventList = this.eventInstances[dateString] || [];
@@ -496,7 +565,7 @@ export class TimelyX {
         
     }
 
-    _updateEventInstances(){
+    private _updateEventInstances(){
         this.eventInstances = {};
         const flatennedEvents = Object.values(this.events).flatMap((events) => events);
         for (const event of flatennedEvents) {
@@ -539,7 +608,7 @@ export class TimelyX {
         this._render();
     }
 
-    addEventInstance(event: TEvent,events: {
+    private addEventInstance(event: TEvent,events: {
         [key: string]: TEvent[];
     }) {
     const startDate = DateTime.fromISO(event.start_date).setZone(this.timezone);
@@ -573,5 +642,10 @@ export class TimelyX {
         // Move to the next day
         currentDate = currentDate.plus({ days: 1 });
     }
+    }
+    addAllEvents(events: TEvent[]) {
+        for (let i = 0; i < events.length; i++) {
+            this.addEvent(events[i]);
+        }
     }
 }

@@ -1,14 +1,7 @@
+import { EventService } from "./core/event_service";
 import { TimelyX } from "./core/timely_x";
-import { TEvent } from "./core/types/t_event";
 
 
-const events : TEvent[] = [
-    {
-        title: "Event 1",
-        start_date: "2022-01-01",
-        end_date: "2022-01-01",
-    },
-]
 
 const calendar = new TimelyX({
     timezone:"America/New_York",
@@ -29,7 +22,7 @@ calendar.addEvent({
     location: "Conference Room A",
     description: "Discuss project updates and deadlines.",
     allDay: false,
-   
+    color:"#FF0000",
     attendees: ["alice@example.com", "bob@example.com"]
 });
 calendar.addEvent({
@@ -39,6 +32,7 @@ calendar.addEvent({
     location: "Conference Room A",
     description: "Discuss project updates and deadlines.",
     allDay: false,
+    color:"#00FF00",
     attendees: ["alice@example.com", "bob@example.com"]
 });
 calendar.addEvent({
@@ -49,6 +43,7 @@ calendar.addEvent({
     description: "Discuss project updates and deadlines.",
     recurrence:"RRULE:FREQ=WEEKLY;WKST=MO;BYDAY=TU",
     allDay: false,
+    color:"#89CFF0",
     attendees: ["alice@example.com", "bob@example.com"]
 });
 calendar.addEvent({
@@ -80,6 +75,18 @@ calendar.addEvent({
     allDay: false,
     attendees: ["alice@example.com", "bob@example.com"]
 });
+
+
+const eventsGenerated  = EventService.fakeEvents();
+// calendar.addAllEvents(events);
+
+for (let i = 0; i < eventsGenerated.length; i++) {
+    const element = eventsGenerated[i];
+    calendar.addEvent(element);
+    
+}
+
+
 
 calendar.onDayClicked = (date, events) => {
     //console.log(date, events);
