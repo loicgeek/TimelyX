@@ -589,7 +589,7 @@ video {
   overflow: hidden;
   position: relative;
   padding-left: var(--tyx-calendar-week-grid-padding-left);
-  padding-top: var(--tyx-calendar-week-grid-padding-top);
+  /* padding-top: var(--tyx-calendar-week-grid-padding-top); */
 }
 
 .tyx__week-grid .tyx__week-grid__time-axis{
@@ -631,6 +631,12 @@ video {
 
 .tyx__week-grid .tyx__week-grid__day .tyx__week-grid__day-event{
   position: absolute;
+  background-color: var(--tyx-primary-color);
+  color: white;
+  border-radius: var(--tyx-calendar-radius);
+  padding: 5px;
+  font-size: 12px;
+  cursor: pointer;
 }
 
 /* General styles */

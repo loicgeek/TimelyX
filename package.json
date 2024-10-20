@@ -14,6 +14,7 @@
         "vite": "^5.4.9"
     },
     "dependencies": {
+        "colord": "^2.9.3",
         "luxon": "^3.5.0",
         "rrule": "^2.8.1",
         "ts-luxon": "^5.0.7-beta.0"

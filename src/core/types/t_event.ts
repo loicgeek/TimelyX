@@ -21,5 +21,8 @@ export interface TEvent{
     recurrence?:string,
 
     // used to handle resource events
-    attendees?:string[]
+    attendees?:string[],
+
+    // color of event
+    color?:string
 }

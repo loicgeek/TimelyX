@@ -2,6 +2,7 @@ import { DateTime, Duration } from 'ts-luxon';
 import { TEvent } from './types/t_event';
 import { THeaderOption } from './types/t_header_option';
 import { rrulestr } from 'rrule';
+import { Color } from '@mirawision/colorize';
 
 type TimelyXView = "month" | "week" | "day";
 
@@ -326,9 +327,14 @@ export class TimelyX {
                 const totalMinutesStart = start.diff(date.startOf("day"),'minutes').minutes;
                 const numberOfSlotsForEvent = (totalMinutesStart / (timeSlotInterval.as("minutes")));
                 const eventYPosition = slotHeight * numberOfSlotsForEvent; 
-                eventDiv.style.top = `${(eventYPosition*100/tyxCalendarWeekGridHeight) + ((tyxCalendarWeekGridPaddingTop*100)/tyxCalendarWeekGridHeight)}%`;
-                
-                eventDivText.innerText = `(${start.toFormat('HH:mm')})`;
+                eventDiv.style.top = `${(eventYPosition*100/tyxCalendarWeekGridHeight)}%`;
+
+                const eventHeight = slotHeight * (end.diff(start,'minutes').minutes / (timeSlotInterval.as("minutes")));
+                eventDiv.style.height = `${(eventHeight*100/tyxCalendarWeekGridHeight)}%`;
+                if(event.color){
+                    eventDiv.style.backgroundColor =hlsa  event.color;
+                }
+                eventDivText.innerText = `(${start.toFormat('HH:mm')}-${end.toFormat('HH:mm')})`;
                 eventDiv.appendChild(eventDivText);
 
 
