@@ -328,6 +328,9 @@ export class TimelyX {
 
             const events = this.eventInstances[date.toISODate()] || [];
 
+
+           
+
             for (let i = 0; i < events.length; i++) {
                 var eventsPercentageIntervals = events.map(e => {
                     var metadata = EventUtils.getEventMetadata(e,
@@ -357,51 +360,36 @@ export class TimelyX {
                 eventDiv.style.height = `${eventMetadata.eventHeightPercentage}%`;
 
                 // start detect collision
-                var otherEventsPercentageIntervals = eventsPercentageIntervals.filter(e => {
-                    return  EventUtils.getId(event) !== EventUtils.getId(e.event)
-                })
 
-
-                
-                var collisions = otherEventsPercentageIntervals.filter(e => {
+                let collisions = eventsPercentageIntervals.filter(e => {
                     return  (e.start > eventMetadata.eventStartPercentage && e.start < eventMetadata.eventEndPercentage)||
-                    e.end > eventMetadata.eventStartPercentage && e.end < eventMetadata.eventEndPercentage
+                    e.end > eventMetadata.eventStartPercentage && e.end < eventMetadata.eventEndPercentage || EventUtils.getId(event) == EventUtils.getId(e.event)
                 })
-                console.log("\n");
-                console.log(`${date.toISODate()}`);
-                
-                console.log("events",events.length,events.map(e=>EventUtils.getId(e)));
-                console.log("otherEventsPercentageIntervals",otherEventsPercentageIntervals.length);
-                console.log("collisions",collisions.length);
-                
-                
-                if(collisions.length>0){
-                    console.log(collisions);
-                }
-                eventDiv.classList.add(`${collisions.length}-collision[${eventMetadata.eventStartPercentage}-${eventMetadata.eventEndPercentage}]-[${eventsPercentageIntervals.map((t)=>t.start-t.end).join(',')}]`);
-                
+
+                // dectect the position of current element within the array with collisions
+                const position = collisions.findIndex(e => {
+                    return EventUtils.getId(event) == EventUtils.getId(e.event)
+                });
+
+                // trim out the current item as it is not an actual collision
+                collisions = collisions.filter(e => {
+                    return EventUtils.getId(event) != EventUtils.getId(e.event)
+                })
                 if(collisions.length==0){
                     eventDiv.style.width = `calc(100%)`;
                 }else{
-
-                    // not yet ready
-                    const position = eventsPercentageIntervals.findIndex(e => {
-                        return EventUtils.getId(event) === EventUtils.getId(e.event)
-                    });
-                    var singleEventW = 100/(collisions.length+1);
-                    var shiftW = singleEventW*(position);
+                    const singleEventW = 100/(collisions.length+1);
+                    const shiftW = singleEventW*(position);
                     eventDiv.style.marginLeft = `calc(${(shiftW)}%)`;
-                    eventDiv.style.width = `calc(${singleEventW}%)`;
+                    eventDiv.style.width = `calc(${(100- shiftW)}%)`;
                     eventDiv.style.zIndex = `${i +1}`
                     eventDiv.classList.add('position-'+position);
                 }
                
-              
                 // end detect collision
 
                 let color = event.color?? getComputedStyle(document.body).getPropertyValue('--tyx-primary-color')
-                // ligher color for background
-                eventDiv.style.borderLeftWidth = '5px';
+                // lighter color for background
                 eventDiv.style.backgroundColor = ColorUtils.generateEventBgColor(color);
                 eventDiv.style.borderLeftColor =ColorUtils.generateEventBorderColor(color);
                 eventDiv.style.color =ColorUtils.generateEventTitleColor(color);

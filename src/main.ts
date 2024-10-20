@@ -35,15 +35,16 @@ calendar.addEvent({
     color:"#00FF00",
     attendees: ["alice@example.com", "bob@example.com"]
 });
+
 calendar.addEvent({
-    title: "Team Meeting 2",
-    start_date: "2024-10-20T15:00:00Z",
-    end_date: "2024-10-20T16:30:00Z",
+    title: " Meeting 2",
+    start_date: "2024-10-20T14:00:00Z",
+    end_date: "2024-10-20T15:00:00Z",
     location: "Conference Room A",
     description: "Discuss project updates and deadlines.",
     recurrence:"RRULE:FREQ=WEEKLY;WKST=MO;BYDAY=TU",
     allDay: false,
-    color:"#89CFF0",
+    color:"#89CFDE",
     attendees: ["alice@example.com", "bob@example.com"]
 });
 calendar.addEvent({
@@ -53,26 +54,49 @@ calendar.addEvent({
     location: "Conference Room A",
     description: "Discuss project updates and deadlines.",
     allDay: false,
+    color:"#0000FF",
     attendees: ["alice@example.com", "bob@example.com"]
 });
 
 calendar.addEvent({
-    title: "Team Meeting 19",
-    start_date: "2024-12-19T11:00:00Z",
-    end_date: "2024-12-19T12:30:00Z",
+    title: "Team Meeting 0933",
+    start_date: "2024-10-19T11:00:00Z",
+    end_date: "2024-10-19T12:30:00Z",
     location: "Conference Room A",
     description: "Discuss project updates and deadlines.",
     allDay: false,
+    color:"#FFFF00",
     attendees: ["alice@example.com", "bob@example.com"]
 });
 
 calendar.addEvent({
-    title: "Team Meeting 19",
-    start_date: "2024-12-19T12:00:00Z",
-    end_date: "2024-12-19T13:30:00Z",
+    title: "Team Meeting 123",
+    start_date: "2024-10-19T12:00:00Z",
+    end_date: "2024-10-19T13:30:00Z",
     location: "Conference Room A",
     description: "Discuss project updates and deadlines.",
     allDay: false,
+    color:"#FF00FF",
+    attendees: ["alice@example.com", "bob@example.com"]
+});
+calendar.addEvent({
+    title: "Team Meeting 99",
+    start_date: "2024-10-19T13:00:00Z",
+    end_date: "2024-10-19T13:30:00Z",
+    location: "Conference Room A",
+    description: "Discuss project updates and deadlines.",
+    allDay: false,
+    color:"#900CF0",
+    attendees: ["alice@example.com", "bob@example.com"]
+});
+calendar.addEvent({
+    title: "Team Meeting 56",
+    start_date: "2024-10-19T13:20:00Z",
+    end_date: "2024-10-19T14:20:00Z",
+    location: "Conference Room A",
+    description: "Discuss project updates and deadlines.",
+    allDay: false,
+    color:"#89CFF0",
     attendees: ["alice@example.com", "bob@example.com"]
 });
 
@@ -82,8 +106,7 @@ const eventsGenerated  = EventService.fakeEvents();
 
 for (let i = 0; i < eventsGenerated.length; i++) {
     const element = eventsGenerated[i];
-    calendar.addEvent(element);
-    
+    calendar.addEvent(element);  
 }
 
 
