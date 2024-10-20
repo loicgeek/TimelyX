@@ -1,4 +1,5 @@
 export interface TEvent{
+    id?:string,
     // The title of the event
     title: string,
 

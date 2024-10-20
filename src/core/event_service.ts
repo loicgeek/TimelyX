@@ -1,3 +1,5 @@
+import { DateTime } from "ts-luxon";
+
 export class EventService {
 
     static fakeEvents(){
@@ -45,6 +47,7 @@ const  getRandomInt = (min:any, max:any)=> {
       endDate.setHours(startHour + duration);
   
       const event = {
+        id:`${DateTime.now().toMillis().toString()}-${i}`,
         title: titles[getRandomInt(0, titles.length)],
         start_date: startDate.toISOString(),
         end_date: endDate.toISOString(),

@@ -328,27 +328,22 @@ export class TimelyX {
 
             const events = this.eventInstances[date.toISODate()] || [];
 
-            var eventsPercentageIntervals = events.map(e => {
-                var metadata = EventUtils.getEventMetadata(e,
-                    date,
-                    tyxCalendarWeekGridHeight,
-                    timeSlotInterval, slotHeight, 
-                    this.timezone,
-                    this.language,
-               )
-                return {
-                    start: metadata.eventStartPercentage,
-                    end: metadata.eventEndPercentage,
-                    event: e
-                }
-            })
-            if(eventsPercentageIntervals.length > 0){
-                console.log("eventsPercentageIntervals",eventsPercentageIntervals);
-            }
-            
-            
-            events.forEach(event => {
-
+            for (let i = 0; i < events.length; i++) {
+                var eventsPercentageIntervals = events.map(e => {
+                    var metadata = EventUtils.getEventMetadata(e,
+                        date,
+                        tyxCalendarWeekGridHeight,
+                        timeSlotInterval, slotHeight, 
+                        this.timezone,
+                        this.language,
+                   )
+                    return {
+                        start: metadata.eventStartPercentage,
+                        end: metadata.eventEndPercentage,
+                        event: e
+                    }
+                })
+                const event = events[i];
                 const eventDiv = document.createElement('div');
                 eventDiv.className = 'tyx__week-grid__day-event';
 
@@ -362,10 +357,46 @@ export class TimelyX {
                 eventDiv.style.height = `${eventMetadata.eventHeightPercentage}%`;
 
                 // start detect collision
+                var otherEventsPercentageIntervals = eventsPercentageIntervals.filter(e => {
+                    return  EventUtils.getId(event) !== EventUtils.getId(e.event)
+                })
+
+
                 
+                var collisions = otherEventsPercentageIntervals.filter(e => {
+                    return  (e.start > eventMetadata.eventStartPercentage && e.start < eventMetadata.eventEndPercentage)||
+                    e.end > eventMetadata.eventStartPercentage && e.end < eventMetadata.eventEndPercentage
+                })
+                console.log("\n");
+                console.log(`${date.toISODate()}`);
+                
+                console.log("events",events.length,events.map(e=>EventUtils.getId(e)));
+                console.log("otherEventsPercentageIntervals",otherEventsPercentageIntervals.length);
+                console.log("collisions",collisions.length);
+                
+                
+                if(collisions.length>0){
+                    console.log(collisions);
+                }
+                eventDiv.classList.add(`${collisions.length}-collision[${eventMetadata.eventStartPercentage}-${eventMetadata.eventEndPercentage}]-[${eventsPercentageIntervals.map((t)=>t.start-t.end).join(',')}]`);
+                
+                if(collisions.length==0){
+                    eventDiv.style.width = `calc(100%)`;
+                }else{
 
-
-
+                    // not yet ready
+                    const position = eventsPercentageIntervals.findIndex(e => {
+                        return EventUtils.getId(event) === EventUtils.getId(e.event)
+                    });
+                    var singleEventW = 100/(collisions.length+1);
+                    var shiftW = singleEventW*(position);
+                    eventDiv.style.marginLeft = `calc(${(shiftW)}%)`;
+                    eventDiv.style.width = `calc(${singleEventW}%)`;
+                    eventDiv.style.zIndex = `${i +1}`
+                    eventDiv.classList.add('position-'+position);
+                }
+               
+              
                 // end detect collision
 
                 let color = event.color?? getComputedStyle(document.body).getPropertyValue('--tyx-primary-color')
@@ -393,7 +424,10 @@ export class TimelyX {
                 }
 
                 dayDivColumn.appendChild(eventDiv);
-            })
+            }
+            
+            
+            
              
         })
         gridDiv.appendChild(weekGrid); // Append week grid to main grid
@@ -611,6 +645,7 @@ export class TimelyX {
     private addEventInstance(event: TEvent,events: {
         [key: string]: TEvent[];
     }) {
+     
     const startDate = DateTime.fromISO(event.start_date).setZone(this.timezone);
     const endDate = DateTime.fromISO(event.end_date).setZone(this.timezone);
 

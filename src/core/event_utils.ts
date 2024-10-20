@@ -5,7 +5,7 @@ import { TEvent } from "./types/t_event";
 
 export class EventUtils{
     static getId(event:TEvent){
-        return Object.entries(event)
+        return event.id?? Object.entries(event)
                 .map(([_, value]) => {
                  const sanitizedValue = String(value).replace(/[^a-zA-Z0-9]/g, ''); // Remove special characters from the value
                     return `${sanitizedValue}`;

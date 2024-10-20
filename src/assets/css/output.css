@@ -658,6 +658,15 @@ video {
   padding: 5px;
   font-size: 12px;
   cursor: pointer;
+  transition: all 0.3s;
+  overflow: hidden;
+}
+
+.tyx__week-grid .tyx__week-grid__day .tyx__week-grid__day-event:hover{
+  z-index: 1000!important;
+  overflow: scroll;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  width: calc(100%)!important;
 }
 
 .tyx__week-grid .tyx__week-grid__day .tyx__week-grid__day-event .tyx__week-grid__day-event-title{
