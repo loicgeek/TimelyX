@@ -14,7 +14,7 @@ export default defineConfig({
     },
     "baseUrl": ".", // Set the base URL for paths
     "paths": {
-        "timely-x": ["dist/types/index-x.d.ts"] // Adjust the path as necessary
+        "timely-x": ["dist/types/index-x.d.ts"], // Adjust the path as necessary,
     },
     rollupOptions: {
         
@@ -22,6 +22,7 @@ export default defineConfig({
       // into your library
       external: [],
       output: {
+        assetFileNames: 'style.css' ,
         // Provide global variables to use in the UMD build
         // for externalized deps
         globals: {

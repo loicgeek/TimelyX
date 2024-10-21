@@ -1,7 +1,7 @@
 {
     "name": "timely-x",
     "private": false,
-    "version": "0.0.2",
+    "version": "0.0.3",
     "type": "module",
     "homepage": "https://github.com/loicgeek/TimelyX",
     "author": {
@@ -18,7 +18,8 @@
         ".": {
             "import": "./dist/timely-x.js",
             "require": "./dist/timely-x.umd.cjs"
-        }
+        },
+        "./style": "./dist/style.css"
     },
     "style": "./dist/style.css",
     "scripts": {

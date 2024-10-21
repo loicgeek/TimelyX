@@ -2,6 +2,7 @@ import { DateTime } from 'ts-luxon';
 import { TEvent } from './types/t_event';
 import { THeaderOption } from './types/t_header_option';
 import { TyxWeekOption } from './types/tyx_week_option';
+import "../assets/css/output.css";
 type TimelyXView = "month" | "week" | "day";
 export declare class TimelyX {
     protected instance?: HTMLElement;

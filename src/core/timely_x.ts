@@ -5,7 +5,7 @@ import { rrulestr } from 'rrule';
 import { ColorUtils } from './color_utils';
 import { EventUtils } from './event_utils';
 import { TyxWeekOption } from './types/tyx_week_option';
-
+import "../assets/css/output.css"
 
 type TimelyXView = "month" | "week" | "day";
 
