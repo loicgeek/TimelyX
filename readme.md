@@ -2,7 +2,10 @@
 
 TimelyX is a powerful and customizable calendar solution, allowing for easy event management and recurrence handling. This README will guide you through how to use TimelyX, add events, and handle various calendar options.
 
-[![](https://markdown-videos-api.jorgenkh.no/youtube/{video_id})](https://youtu.be/{video_id})
+<video width="640" height="480" controls>
+  <source src="./docs/demo-timely-x.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
 
 
 ## Table of Contents
