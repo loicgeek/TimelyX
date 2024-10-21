@@ -25,7 +25,7 @@ TimelyX is a powerful and customizable calendar solution, allowing for easy even
 To install and start using TimelyX, run this command in your project:
 
 ```bash
-npm install timelyx
+npm install timely-x
 ```
 
 ## Usage
