@@ -35,8 +35,8 @@ npm install timely-x
 To start using TimelyX, you first need to import the necessary utilities and initialize the calendar. Here's how you can set up the calendar with basic options:
 
 ```js
-import { EventUtils } from "./core/event_utils";
-import { TimelyX } from "./core/timely_x";
+import { TimelyX } from "timely-x";
+import 'timely-x/style'
 
 const calendar = new TimelyX({
     timezone: "America/New_York",  // Set your preferred timezone
