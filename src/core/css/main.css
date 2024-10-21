@@ -90,9 +90,9 @@ body {
     flex-grow: 2;
     overflow-y: scroll;
 }
-.calendar.small-grid .calendar-grid{
+/* .calendar.small-grid .calendar-grid{
     display: contents;
-}
+} */
 .calendar.large-grid .calendar-grid .events-list{
     display: none;
 }
@@ -185,6 +185,16 @@ body {
 
 .calendar.large-grid .date-cell{
     min-height: 80px;
+    border-bottom: 1px solid #f0f0f0;
+    margin: 0;
+}
+.calendar.large-grid .date-cell:hover{
+    background-color: inherit;
+}
+.calendar.large-grid .date-cell.selected-date{
+   border: none;
+   background-color: inherit;
+   border-bottom: 1px solid #f0f0f0;
 }
 .calendar.large-grid .event-list{
     display: none;
@@ -204,9 +214,7 @@ body {
 }
 .calendar.large-grid .event-list-large .event-title{
     font-size: 10px;
-    color: white;
     padding: 1px;
-    background-color: var(--tyx-primary-color);
     border-radius: var(--tyx-calendar-radius);
 }
 
@@ -254,7 +262,7 @@ body {
     }
      /* Individual event item styles */
      .event-list .event-item {
-        background-color: var(--tyx-primary-color);
+         background-color: var(--tyx-primary-color);
          border-radius: var(--tyx-calendar-radius);
          padding: 10px;
          color: #ffffff; /* White text */
@@ -267,7 +275,6 @@ body {
      .event-list .event-item .event-time {
         display: none;
          font-size: 12px;
-         color: rgba(255, 255, 255, 0.8); /* Slightly lighter text for time */
          display: flex;
          align-items: center;
      }

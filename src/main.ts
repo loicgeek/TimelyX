@@ -2,18 +2,28 @@ import { EventService } from "./core/event_service";
 import { TimelyX } from "./core/timely_x";
 
 
-
 const calendar = new TimelyX({
     timezone:"America/New_York",
-    language:"en",
+    language:"en-US",
     view:'week',
     handleEvents:true,
     tHeaderOption:{
         currentMonthFormat:"MMMM yyyy",
         dayFormat:"ccc"
+    },
+    tyxWeekOption:{
+        timeSlotInterval:30,
+        startHourOfDay:4,
+        endHourOfDay:22,
+        timeSlotHeight:90
     }
 });
+
 calendar.mount("#timely-calendar");
+
+setTimeout(() => {
+    calendar.changeViewType('month');
+}, 5000);
 
 calendar.addEvent({
     title: "Team Meeting",
