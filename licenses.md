@@ -13,7 +13,7 @@ This Software License Agreement ("Agreement") is between you ("Licensee") and Lo
      - Business operations
      - Redistribution
      - Selling or sublicensing
-   - Requires a paid license. To obtain a paid license, please contact [Your Contact Information].
+   - Requires a paid license. To obtain a paid license, please contact loic.ngou98@gmail.com.
 
 3. **Restrictions**: 
    - You may not distribute, modify, or create derivative works of the Software without prior written permission from the Licensor.
