@@ -1,21 +1,32 @@
 {
     "name": "timely-x",
     "private": false,
-    "version": "0.0.1",
+    "version": "0.0.2",
     "type": "module",
     "homepage": "https://github.com/loicgeek/TimelyX",
     "author": {
         "name": "loicgeek",
         "email": "loic.ngou98@gmail.com",
         "url": "https://github.com/loicgeek"
-
+    },
+    "files": [
+        "dist"
+    ],
+    "main": "./dist/timely-x.umd.cjs",
+    "module": "./dist/timely-x.js",
+    "exports": {
+        ".": {
+            "import": "./dist/timely-x.js",
+            "require": "./dist/timely-x.umd.cjs"
+        }
     },
     "scripts": {
         "dev": "vite",
-        "build": "tsc && vite build",
+        "build": "npx tailwindcss -i ./src/core/css/main.css -o ./src/assets/css/output.css && vite build && tsc --declaration --outDir dist/types",
         "preview": "vite preview"
     },
     "devDependencies": {
+        "rollup-plugin-dts": "^6.1.1",
         "tailwindcss": "^3.4.14",
         "typescript": "^5.5.3",
         "vite": "^5.4.9"

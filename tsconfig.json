@@ -1,24 +1,31 @@
 {
-    "compilerOptions": {
+  "compilerOptions": {
       "target": "ES2020",
       "useDefineForClassFields": true,
       "module": "ESNext",
       "lib": ["ES2020", "DOM", "DOM.Iterable"],
       "skipLibCheck": true,
-  
+
       /* Bundler mode */
       "moduleResolution": "bundler",
+      "emitDeclarationOnly": true,
       "allowImportingTsExtensions": true,
       "isolatedModules": true,
       "moduleDetection": "force",
-      "noEmit": true,
-  
+      "declaration": true, // Add this line
+      "outDir": "./dist/types", // Make sure this is where you want the declaration files
+      "declarationDir": "./dist/types", // Optionally specify the declaration directory
+
       /* Linting */
       "strict": true,
       "noUnusedLocals": true,
       "noUnusedParameters": true,
       "noFallthroughCasesInSwitch": true
-    },
-    "include": ["src"]
-  }
-  
+  },
+  "include": [
+      "src/**/*.ts"
+  ],
+  "exclude": [
+      "node_modules"
+  ]
+}

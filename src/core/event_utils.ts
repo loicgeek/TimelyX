@@ -43,7 +43,7 @@ export class EventUtils{
       }
       
       static fakeEvents  =  ()=> {
-        const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
         const colors = ["#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#FF00FF"];
         const titles = ["Team Meeting", "Client Call", "Code Review", "Marketing Strategy", "Design Sync"];
         const locations = ["Conference Room A", "Zoom", "Office 1", "Office 2", "Online"];
