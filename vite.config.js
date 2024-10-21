@@ -12,7 +12,12 @@ export default defineConfig({
       // the proper extensions will be added
       fileName: 'timely-x',
     },
+    "baseUrl": ".", // Set the base URL for paths
+    "paths": {
+        "timely-x": ["dist/types/index-x.d.ts"] // Adjust the path as necessary
+    },
     rollupOptions: {
+        
       // make sure to externalize deps that shouldn't be bundled
       // into your library
       external: [],
@@ -23,7 +28,9 @@ export default defineConfig({
          
         },
         plugins: [
-            
+            dts({
+                include: ['./src/**/*.ts'], // Include your source files for type definitions
+            }),
         ],
       },
     },

@@ -11,6 +11,6 @@ import type  {
     TEvent,
     THeaderOption,
     TyxWeekOption
-} from './core/types'
+} from './core/types/index'
 
 export {TimelyX,EventUtils,TEvent,THeaderOption,TyxWeekOption};

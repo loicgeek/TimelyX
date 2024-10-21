@@ -1,5 +1,5 @@
 import { DateTime, Duration } from "ts-luxon";
-import { TEvent } from "./types/t_event";
+import { TEvent } from "./types/t_event.js"
 
 
 

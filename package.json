@@ -10,7 +10,7 @@
         "url": "https://github.com/loicgeek"
     },
     "files": [
-        "dist"
+        "dist/**/*"
     ],
     "main": "./dist/timely-x.umd.cjs",
     "module": "./dist/timely-x.js",
@@ -20,9 +20,10 @@
             "require": "./dist/timely-x.umd.cjs"
         }
     },
+    "style": "./dist/style.css",
     "scripts": {
         "dev": "vite",
-        "build": "npx tailwindcss -i ./src/core/css/main.css -o ./src/assets/css/output.css && vite build && tsc --declaration --outDir dist/types",
+        "build": "npx tailwindcss -i ./src/core/css/main.css -o ./src/assets/css/output.css && vite build && tsc  && cp dist/types/index.d.ts dist/timely-x.d.ts",
         "preview": "vite preview"
     },
     "devDependencies": {

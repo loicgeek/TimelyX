@@ -7854,7 +7854,4 @@ class zn {
       this.addEvent(e[t]);
   }
 }
-export {
-  Pe as EventUtils,
-  zn as TimelyX
-};
+export { Pe as EventUtils, zn as TimelyX };
