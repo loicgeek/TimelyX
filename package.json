@@ -1,8 +1,15 @@
 {
     "name": "timely-x",
-    "private": true,
-    "version": "0.0.0",
+    "private": false,
+    "version": "0.0.1",
     "type": "module",
+    "homepage": "https://github.com/loicgeek/TimelyX",
+    "author": {
+        "name": "loicgeek",
+        "email": "loic.ngou98@gmail.com",
+        "url": "https://github.com/loicgeek"
+
+    },
     "scripts": {
         "dev": "vite",
         "build": "tsc && vite build",
