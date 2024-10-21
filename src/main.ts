@@ -1,4 +1,5 @@
-import { EventService } from "./core/event_service";
+
+import { EventUtils } from "./core/event_utils";
 import { TimelyX } from "./core/timely_x";
 
 
@@ -111,7 +112,7 @@ calendar.addEvent({
 });
 
 
-const eventsGenerated  = EventService.fakeEvents();
+const eventsGenerated  = EventUtils.fakeEvents();
 // calendar.addAllEvents(events);
 
 for (let i = 0; i < eventsGenerated.length; i++) {
@@ -127,5 +128,8 @@ calendar.onDayClicked = (date, events) => {
 calendar.onTEventClicked = (event) => {
     
 }
-console.log(calendar);
+calendar.onBordersChanged = (start,end) => {
+    
+}
+
 
