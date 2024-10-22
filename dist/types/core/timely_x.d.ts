@@ -1,9 +1,9 @@
 import { DateTime } from 'ts-luxon';
-import { TEvent } from './types/t_event';
-import { THeaderOption } from './types/t_header_option';
+import { TyxEvent } from './types/tyx_event';
+import { TyxHeaderOption } from './types/tyx_header_option';
 import { TyxWeekOption } from './types/tyx_week_option';
 import "../assets/css/output.css";
-type TimelyXView = "month" | "week" | "day";
+import { TyxView } from './types/tyx_view';
 export declare class TimelyX {
     protected instance?: HTMLElement;
     timezone: string;
@@ -19,8 +19,8 @@ export declare class TimelyX {
     private tyxWeekOption;
     private handleEvents;
     isMobile: boolean;
-    onDayClicked?: (date: DateTime, events: TEvent[]) => void;
-    onTEventClicked?: (event: TEvent) => void;
+    onDayClicked?: (date: DateTime, events: TyxEvent[]) => void;
+    onTEventClicked?: (event: TyxEvent) => void;
     onBordersChanged?: (start: DateTime, end: DateTime) => void;
     constructor({ timezone, selectedDate, language, view, // Default view,
     tHeaderOption, tyxWeekOption, handleEvents }?: {
@@ -28,13 +28,13 @@ export declare class TimelyX {
         selectedDate?: string | undefined;
         language?: string | undefined;
         view?: string | undefined;
-        tHeaderOption?: THeaderOption | undefined;
+        tHeaderOption?: TyxHeaderOption | undefined;
         tyxWeekOption?: TyxWeekOption | undefined;
         handleEvents?: boolean | undefined;
     });
     private adjustGridClass;
     mount(selectorString: string): void;
-    changeViewType(view: TimelyXView): void;
+    changeViewType(view: TyxView): void;
     previous(): void;
     next(): void;
     protected _changeMonth(delta: number): void;
@@ -55,8 +55,7 @@ export declare class TimelyX {
     private _handleTEventClick;
     private _populateEventDetails;
     private _updateEventInstances;
-    addEvent(event: TEvent): void;
+    addEvent(event: TyxEvent): void;
     private addEventInstance;
-    addAllEvents(events: TEvent[]): void;
+    addAllEvents(events: TyxEvent[]): void;
 }
-export {};

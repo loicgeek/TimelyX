@@ -1,4 +1,4 @@
-export interface TEvent {
+export interface TyxEvent {
     id?: string;
     title: string;
     start_date: string;

@@ -1,8 +1,8 @@
 import { DateTime, Duration } from "ts-luxon";
-import { TEvent } from "./types/t_event.js";
+import { TyxEvent } from "./types/tyx_event.js";
 export declare class EventUtils {
-    static getId(event: TEvent): string;
-    static getEventMetadata(event: TEvent, date: DateTime, tyxCalendarWeekGridHeight: number, timeSlotInterval: Duration, slotHeight: number, timezone: string, language: string): {
+    static getId(event: TyxEvent): string;
+    static getEventMetadata(event: TyxEvent, date: DateTime, tyxCalendarWeekGridHeight: number, timeSlotInterval: Duration, slotHeight: number, timezone: string, language: string): {
         eventStartPercentage: number;
         eventHeightPercentage: number;
         eventEndPercentage: number;
