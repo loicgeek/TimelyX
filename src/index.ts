@@ -9,9 +9,9 @@ import {
 } from './core/event_utils'
 
 import type  {
-    TEvent,
-    THeaderOption,
+    TyxEvent,
+    TyxHeaderOption,
     TyxWeekOption
 } from './core/types/index'
 
-export {TimelyX,EventUtils,TEvent,THeaderOption,TyxWeekOption};
+export {TimelyX,EventUtils,TyxEvent,TyxHeaderOption,TyxWeekOption};

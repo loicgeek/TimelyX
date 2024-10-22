@@ -82,8 +82,6 @@ export class TimelyX {
             calendarElement?.classList.remove('small-grid');
         }
     }
-    
-    
 
     mount(selectorString: string) {
         this.instance = document.querySelector(selectorString) as HTMLElement;
