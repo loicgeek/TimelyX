@@ -1,4 +1,4 @@
-export interface THeaderOption {
+export interface TyxHeaderOption {
     currentMonthFormat?:string
     dayFormat?:string
 }

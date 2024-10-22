@@ -1,13 +1,14 @@
 import { DateTime, Duration } from 'ts-luxon';
-import { TEvent } from './types/t_event';
-import { THeaderOption } from './types/t_header_option';
+import { TyxEvent } from './types/tyx_event';
+import { TyxHeaderOption } from './types/tyx_header_option';
 import { rrulestr } from 'rrule';
 import { ColorUtils } from './color_utils';
 import { EventUtils } from './event_utils';
 import { TyxWeekOption } from './types/tyx_week_option';
 import "../assets/css/output.css"
+import { TyxView } from './types/tyx_view';
 
-type TimelyXView = "month" | "week" | "day";
+
 
 export class TimelyX {
    protected instance?: HTMLElement;
@@ -17,15 +18,15 @@ export class TimelyX {
     private  endDate: DateTime;
     private language: string;
     private daysOfWeek: Record<string,any>[];
-    private  events: { [key: string]: TEvent[] }; // Event storage
-    private eventInstances: { [key: string]: TEvent[] }; // Event storage
-    private view: TimelyXView; // Current view
-    private tHeaderOption: THeaderOption;
+    private  events: { [key: string]: TyxEvent[] }; // Event storage
+    private eventInstances: { [key: string]: TyxEvent[] }; // Event storage
+    private view: TyxView; // Current view
+    private tHeaderOption: TyxHeaderOption;
     private tyxWeekOption: TyxWeekOption;
     private handleEvents:boolean;
     isMobile = window.matchMedia("(max-width: 600px)").matches;
-    onDayClicked?: (date: DateTime, events: TEvent[]) => void;
-    onTEventClicked?: (event: TEvent) => void;
+    onDayClicked?: (date: DateTime, events: TyxEvent[]) => void;
+    onTEventClicked?: (event: TyxEvent) => void;
     onBordersChanged?: (start: DateTime,end: DateTime) => void;
 
 
@@ -36,7 +37,7 @@ export class TimelyX {
         view = 'month', // Default view,
         tHeaderOption = {
            
-        } as THeaderOption,
+        } as TyxHeaderOption,
         tyxWeekOption = {
            
         } as TyxWeekOption,
@@ -48,7 +49,7 @@ export class TimelyX {
         
         this.events = {};
         this.eventInstances = {};
-        this.view = view as TimelyXView;
+        this.view = view as TyxView;
         this.tHeaderOption = {
              currentMonthFormat:'MMMM yyyy',
             dayFormat:'ccc',
@@ -93,7 +94,7 @@ export class TimelyX {
         window.addEventListener('resize', this.adjustGridClass);
         this.adjustGridClass();
     }
-    changeViewType(view: TimelyXView){
+    changeViewType(view: TyxView){
         this.view = view;
         this._renderDayHeaders();
         this._render();
@@ -574,7 +575,7 @@ export class TimelyX {
             // Optionally display events or open a detailed view
         }
     }
-    private _handleTEventClick(event:TEvent) {
+    private _handleTEventClick(event:TyxEvent) {
         this.onTEventClicked?.call(this,event);
     }
 
@@ -650,7 +651,7 @@ export class TimelyX {
                         attendees: event.attendees,
                         allDay: event.allDay,
                         recurrence: event.recurrence,
-                    } as TEvent
+                    } as TyxEvent
                     
                     this.addEventInstance(newEvent, this.eventInstances);
                 })
@@ -660,13 +661,13 @@ export class TimelyX {
     }
 
    
-    addEvent(event: TEvent) {
+    addEvent(event: TyxEvent) {
         this.addEventInstance(event,this.events)
         this._render();
     }
 
-    private addEventInstance(event: TEvent,events: {
-        [key: string]: TEvent[];
+    private addEventInstance(event: TyxEvent,events: {
+        [key: string]: TyxEvent[];
     }) {
      
     const startDate = DateTime.fromISO(event.start_date).setZone(this.timezone);
@@ -701,7 +702,7 @@ export class TimelyX {
         currentDate = currentDate.plus({ days: 1 });
     }
     }
-    addAllEvents(events: TEvent[]) {
+    addAllEvents(events: TyxEvent[]) {
         for (let i = 0; i < events.length; i++) {
             this.addEvent(events[i]);
         }

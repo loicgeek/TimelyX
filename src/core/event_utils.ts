@@ -1,10 +1,10 @@
 import { DateTime, Duration } from "ts-luxon";
-import { TEvent } from "./types/t_event.js"
+import { TyxEvent } from "./types/tyx_event.js"
 
 
 
 export class EventUtils{
-    static getId(event:TEvent){
+    static getId(event:TyxEvent){
         return event.id?? Object.entries(event)
                 .map(([_, value]) => {
                  const sanitizedValue = String(value).replace(/[^a-zA-Z0-9]/g, ''); // Remove special characters from the value
@@ -12,7 +12,7 @@ export class EventUtils{
                 })
                 .join('');
     }
-    static getEventMetadata(event:TEvent,
+    static getEventMetadata(event:TyxEvent,
         date:DateTime,
         tyxCalendarWeekGridHeight: number, 
         timeSlotInterval: Duration,
