@@ -121,13 +121,13 @@ for (let i = 0; i < eventsGenerated.length; i++) {
 
 
 calendar.onDayClicked = (date:any, events:any) => {
-    console.log(date, events);
+   // console.log(date, events);
 }
 calendar.onTEventClicked = (event:any) => {
-    console.log(event);
+   // console.log(event);
 }
 calendar.onBordersChanged = (start:any,end:any) => {
-    console.log(start, end);
+  //  console.log(start, end);
 }
 
 

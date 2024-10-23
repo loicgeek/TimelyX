@@ -560,7 +560,7 @@ video {
   --tyx-primary-color: #6B5AED;
   --tyx-calendar-bg-color: white;
   --tyx-header-bg-color: white;
-  --tyx-calendar-radius: 8px;
+  --tyx-calendar-radius: 6px;
   --tyx-calendar-week-grid-padding-left: 75px;
   --tyx-calendar-week-grid-padding-top: 10px;
   --tyx-calendar-week-grid-height: 1400px;
@@ -831,8 +831,8 @@ body {
 }
 
 .date-cell.today{
-  background-color: var(--tyx-primary-color);
-  color: white;
+  border: 1px solid;
+  border-color: var(--tyx-primary-color)!important;
   border-radius: var(--tyx-calendar-radius);
 }
 
@@ -908,6 +908,15 @@ body {
   gap: 2px;
 }
 
+.calendar.large-grid  .event-item{
+  border-radius: var(--tyx-calendar-radius);
+  overflow-x: hidden;
+  margin-top: 2px;
+  text-align: left;
+  padding-left: 2px;
+  font-weight: 550;
+}
+
 .calendar.large-grid .event-list-large .event-time{
   display: none;
 }
@@ -916,6 +925,108 @@ body {
   font-size: 10px;
   padding: 1px;
   border-radius: var(--tyx-calendar-radius);
+}
+
+.calendar.large-grid .event-list-large .event-details{
+  height: 18px;
+}
+
+/* Modal base styles */
+
+.tyx-modal-overlay{
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  transition: opacity 0.3s ease-in-out;
+  /* Transition for fade-in and fade-out */
+}
+
+.tyx-modal {
+  box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.1);
+  overflow: auto;
+  height: -moz-fit-content;
+  height: fit-content;
+  width: -moz-fit-content;
+  width: fit-content;
+  border-radius: var(--tyx-calendar-radius);
+  transition: opacity 0.3s ease-in-out;
+  /* Transition for fade-in and fade-out */
+  opacity: 0;
+  /* Initial state: fully transparent */
+}
+
+.tyx-modal-content {
+  background-color: #fff;
+  padding: 20px;
+  height: 100%;
+  width: 100%;
+  overflow: scroll;
+  border-radius: 8px;
+  transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+  /* Animation for slide and fade */
+  opacity: 0;
+  /* Hidden initially */
+  transform: translateY(-30px);
+  /* Slide-in from above */
+}
+
+.tyx-modal-content  #tyx-modal-title{
+  font-size: medium;
+  color: var(--tyx-primary-color);
+}
+
+.tyx-modal-content  #tyx-modal-time{
+  font-size: small;
+  color: gray;
+}
+
+.tyx-modal-content  #tyx-modal-description{
+  font-size: small;
+  color: grey;
+}
+
+.tyx-modal-content  #tyx-modal-location{
+  font-size: small;
+  color: grey;
+}
+
+.tyx-modal-content  #tyx-modal-attendees span{
+  font-size: 11px;
+  background-color: var(--tyx-primary-color);
+  color: white;
+  padding: 4px;
+  border-radius: 50px;
+  margin-left: 2px;
+}
+
+/* Show state: visible and positioned */
+
+.tyx-modal-show .tyx-modal-content {
+  opacity: 1;
+  /* Fade-in */
+  transform: translateY(0);
+  /* Slide-in to the target position */
+}
+
+.tyx-modal-show {
+  opacity: 1;
+  /* Fade-in background */
+}
+
+/* Hide state: fade out and slide away */
+
+.tyx-modal-hide .tyx-modal-content {
+  opacity: 0;
+  /* Fade-out */
+  transform: translateY(-30px);
+  /* Slide-out */
+}
+
+.tyx-modal-hide {
+  opacity: 0;
+  /* Fade-out background */
 }
 
 /* Responsive styles */
@@ -967,8 +1078,6 @@ body {
   /* Individual event item styles */
 
   .event-list .event-item {
-    background-color: var(--tyx-primary-color);
-    border-radius: var(--tyx-calendar-radius);
     padding: 10px;
     color: #ffffff;
     /* White text */

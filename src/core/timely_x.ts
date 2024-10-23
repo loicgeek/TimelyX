@@ -17,6 +17,7 @@ export class TimelyX {
     private startDate: DateTime;
     private  endDate: DateTime;
     private language: string;
+    private disableDefaultEventClick: boolean;
     private daysOfWeek: Record<string,any>[];
     private  events: { [key: string]: TyxEvent[] }; // Event storage
     private eventInstances: { [key: string]: TyxEvent[] }; // Event storage
@@ -41,7 +42,8 @@ export class TimelyX {
         tyxWeekOption = {
            
         } as TyxWeekOption,
-        handleEvents = false
+        handleEvents = false,
+        disableDefaultEventClick =false,
     } = {}) {
         this.timezone = timezone;
         this.language = language;
@@ -67,6 +69,7 @@ export class TimelyX {
         this.startDate = this.selectedDate.startOf(view.toString() as 'month' | 'week' | 'day');
         this.endDate = this.selectedDate.endOf(view.toString() as 'month' | 'week' | 'day');
         this.daysOfWeek = this._getDayHeaders();
+        this.disableDefaultEventClick = disableDefaultEventClick;
         
     }
 
@@ -259,7 +262,10 @@ export class TimelyX {
             eventTime.className = 'event-time';
             eventTime.innerText = `${DateTime.fromISO(tevent.start_date).setZone(this.timezone).setLocale(this.language).toFormat('HH:mm a')} - ${DateTime.fromISO(tevent.end_date).setZone(this.timezone).setLocale(this.language).toFormat('HH:mm a')}`;
             eventItem.appendChild(eventTime);
-            eventItem.addEventListener('click', () => this._handleTEventClick(tevent));
+            eventItem.addEventListener('click', (ev) =>{
+                ev.stopPropagation();
+                this._handleTEventClick(tevent,ev.target as HTMLElement);
+            });
             eventListDiv.appendChild(eventItem);
         })
         const calendarContent = document.querySelector('.calendar-content') as HTMLElement
@@ -377,7 +383,10 @@ export class TimelyX {
                 })
                 const event = events[i];
                 const eventDiv = document.createElement('div');
-                eventDiv.addEventListener('click', () => this._handleTEventClick(event));
+                eventDiv.addEventListener('click', (ev) => {
+                    ev.stopPropagation();
+                    this._handleTEventClick(event,ev.target as HTMLElement);
+                });
                 eventDiv.className = 'tyx__week-grid__day-event';
 
                 const eventMetadata = EventUtils.getEventMetadata(event,
@@ -573,7 +582,13 @@ export class TimelyX {
             // Optionally display events or open a detailed view
         }
     }
-    private _handleTEventClick(event:TyxEvent) {
+    private _handleTEventClick(event:TyxEvent, target:HTMLElement) {
+        if(!this.disableDefaultEventClick){
+            this.closeModal();
+            this.showEventModal(event,target);
+
+        }
+
         this.onTEventClicked?.call(this,event);
     }
 
@@ -594,14 +609,17 @@ export class TimelyX {
 
                 // end
                 eventItem.className = 'event-item';
-                eventItem.addEventListener('click', () => this._handleTEventClick(event));
+                eventItem.addEventListener('click', (ev)=>{
+                    ev.stopPropagation();
+                    this._handleTEventClick(event,ev.target as HTMLElement);
+                });
                 const eventDetails = document.createElement('div');
                 eventDetails.className = 'event-details';
                 eventItem.appendChild(eventDetails);
     
                 const eventTitle = document.createElement('div');
                 eventTitle.className = 'event-title';
-                eventTitle.innerText = event.title;
+                eventTitle.innerText =`${DateTime.fromISO(event.start_date).setZone(this.timezone).setLocale(this.language).toFormat('HH:mm a')} - ${event.title}` ;
                 eventDetails.appendChild(eventTitle);
     
                 const eventTime = document.createElement('div');
@@ -705,4 +723,154 @@ export class TimelyX {
             this.addEvent(events[i]);
         }
     }
+
+    // Function to show event details in a modal
+    showEventModal(event:TyxEvent, target:HTMLElement) {
+
+        const modalOverlay = document.createElement('div');
+        modalOverlay.id = 'tyx-modal-overlay';
+        modalOverlay.className = 'tyx-modal-overlay'; // Added class for styling
+        // Create modal and its content
+        const modal = document.createElement('div');
+        modal.id = 'tyx-event-modal';
+        modal.classList.add('tyx-modal'); // Added class for styling
+      
+        const modalContent = document.createElement('div');
+        modalContent.id = 'tyx-modal-content';
+        modalContent.classList.add('tyx-modal-content'); // Added class for styling
+      
+        // Add event title and description to the modal content
+        const title = document.createElement('h2');
+        title.id = 'tyx-modal-title';
+        title.innerHTML = event.title;
+        modalContent.appendChild(title);
+
+       
+        const time = document.createElement('p');
+        time.id = 'tyx-modal-time';
+        time.innerHTML = `${DateTime.fromISO(event.start_date).setZone(this.timezone).toFormat('HH:mm a')} - ${DateTime.fromISO(event.end_date).setZone(this.timezone).toFormat('HH:mm a')}`;
+        modalContent.appendChild(time);
+        
+      
+        if (event.description) {
+            const description = document.createElement('p');
+            description.id = 'tyx-modal-description';
+            description.innerHTML = event.description;
+            modalContent.appendChild(description);
+        }
+        if (event.location) {
+            const location = document.createElement('p');
+            location.id = 'tyx-modal-location';
+            location.innerHTML = event.location;
+            modalContent.appendChild(location);
+        }
+        if (event.attendees) {
+            const attendees = document.createElement('p');
+            attendees.id = 'tyx-modal-attendees';
+            event.attendees?.forEach(attendee => {
+                const attendeeElement = document.createElement('span');
+                attendeeElement.innerHTML = attendee;
+                attendees.appendChild(attendeeElement);
+            })
+            modalContent.appendChild(attendees);
+        }
+
+        modal.appendChild(modalContent);
+        document.body.appendChild(modal);
+        document.body.appendChild(modalOverlay);
+
+        const getTop = (el:HTMLElement):any =>  el.offsetTop + (el.offsetParent && getTop(el.offsetParent as HTMLElement) || 0);
+        const getLeft = (el:HTMLElement):any =>  el.offsetLeft + (el.offsetParent && getLeft(el.offsetParent as HTMLElement) || 0);
+       
+
+         // Get the target element's coordinates
+        const targetCoords = target.getBoundingClientRect();
+
+        // Now that the modal is in the DOM, compute its size
+        const modalRect = modal.getBoundingClientRect();
+        const modalWidth = modalRect.width;
+        const modalHeight = modalRect.height;
+
+    
+        const cangoRight = targetCoords.left + modalWidth <= window.innerWidth;
+        const cangoLeft = targetCoords.left >= modalWidth;
+        const cangoTop = targetCoords.top >= modalHeight;
+        const cangoBottom = targetCoords.bottom + modalHeight <= window.innerHeight;
+
+          // Determine position based on available space
+        let top, left;
+
+        // Combination checks: prioritize available space
+        if (cangoBottom && cangoRight) {
+            // Place the modal below and to the right of the target element
+            top = targetCoords.bottom + window.scrollY;
+            left = targetCoords.right;
+        } else if (cangoBottom && cangoLeft) {
+            // Place the modal below and to the left of the target element
+            top = targetCoords.bottom + window.scrollY;
+            left = targetCoords.left - modalWidth;
+        } else if (cangoTop && cangoRight) {
+            // Place the modal above and to the right of the target element
+            top = targetCoords.top + window.scrollY - modalHeight;
+            left = targetCoords.right;
+        } else if (cangoTop && cangoLeft) {
+            // Place the modal above and to the left of the target element
+            top = targetCoords.top + window.scrollY - modalHeight;
+            left = targetCoords.left - modalWidth;
+        } else if (cangoRight) {
+            // Default: place the modal to the right of the target element
+            top = targetCoords.top + window.scrollY;
+            left = targetCoords.right;
+        } else if (cangoLeft) {
+            // Default: place the modal to the left of the target element
+            top = targetCoords.top + window.scrollY;
+            left = targetCoords.left - modalWidth;
+        } else if (cangoBottom) {
+            // Default: place the modal below the target element
+            top = targetCoords.bottom + window.scrollY;
+            left = targetCoords.left;
+        } else if (cangoTop) {
+            // Default: place the modal above the target element
+            top = targetCoords.top + window.scrollY - modalHeight;
+            left = targetCoords.left;
+        } else {
+            // Fallback: place the modal at the bottom of the target element
+            top = targetCoords.bottom + window.scrollY;
+            left = targetCoords.left;
+        }
+
+        // Set the modal's position
+        modal.style.position = 'absolute';
+        modal.style.top = `${top}px`;
+        modal.style.left = `${left}px`;
+      
+        // Apply animation (fade-in and slide-in)
+        setTimeout(() => {
+            modalOverlay.classList.add('tyx-modal-show');
+            modal.classList.add('tyx-modal-show'); // Trigger the show animation
+        }, 10); // Small delay to ensure the modal is properly positioned
+      
+        // Close modal when clicking outside of the modal content
+        modalOverlay.addEventListener('click', (event) => {
+            this.closeModal();
+        });
+      }
+      
+      closeModal() {
+        const modal = document.getElementById('tyx-event-modal');
+        const modalOverlay = document.getElementById('tyx-modal-overlay');
+        if (modal && modalOverlay) {
+          // Apply fade-out animation before removal
+          modal.classList.remove('tyx-modal-show');
+          modal.classList.add('tyx-modal-hide');
+
+          modalOverlay.classList.remove('tyx-modal-show');
+          modalOverlay.classList.add('tyx-modal-hide');
+          // Wait for the animation to complete, then remove the modal
+          setTimeout(() => {
+            modal.remove();
+            modalOverlay.remove();
+          }, 300); // The same duration as the hide animation
+        }
+      }
 }
