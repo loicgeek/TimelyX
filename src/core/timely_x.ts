@@ -7,10 +7,13 @@ import { EventUtils } from './event_utils';
 import { TyxWeekOption } from './types/tyx_week_option';
 import "../assets/css/output.css"
 import { TyxView } from './types/tyx_view';
+import { Resizer } from './plugins/resizer';
+import { VerticalDragger } from './plugins/vertical_dragger';
 
 
 
 export class TimelyX {
+    protected resizer: Resizer;
    protected instance?: HTMLElement;
     timezone: string;
     private selectedDate?: DateTime;
@@ -28,6 +31,7 @@ export class TimelyX {
     isMobile = window.matchMedia("(max-width: 600px)").matches;
     onDayClicked?: (date: DateTime, events: TyxEvent[]) => void;
     onTEventClicked?: (event: TyxEvent) => void;
+    onTEventUpdated?: (event: TyxEvent) => void;
     onBordersChanged?: (start: DateTime,end: DateTime) => void;
 
 
@@ -70,6 +74,7 @@ export class TimelyX {
         this.endDate = this.selectedDate.endOf(view.toString() as 'month' | 'week' | 'day');
         this.daysOfWeek = this._getDayHeaders();
         this.disableDefaultEventClick = disableDefaultEventClick;
+        this.resizer = new Resizer();
         
     }
 
@@ -357,6 +362,7 @@ export class TimelyX {
 
         const weekDates = this._getDatesForWeek();
         weekDates.forEach(date => {
+            const startHourOfDay = DateTime.fromObject({day:date.day,month:date.month,year:date.year,  hour: this.tyxWeekOption.startHourOfDay });
              const dayDivColumn = document.createElement('div');
              dayDivColumn.className = 'tyx__week-grid__day';
              dayDivColumn.classList.add(`tyx__${date.toFormat('EEEE').toLowerCase()}`);
@@ -365,11 +371,11 @@ export class TimelyX {
              weekGrid.appendChild(dayDivColumn);
 
             const events = this.eventInstances[date.toISODate()] || [];
-
+            
             for (let i = 0; i < events.length; i++) {
                 var eventsPercentageIntervals = events.map(e => {
                     var metadata = EventUtils.getEventMetadata(e,
-                        date,
+                        startHourOfDay,
                         tyxCalendarWeekGridHeight,
                         timeSlotInterval, slotHeight, 
                         this.timezone,
@@ -383,18 +389,23 @@ export class TimelyX {
                 })
                 const event = events[i];
                 const eventDiv = document.createElement('div');
+                
                 eventDiv.addEventListener('click', (ev) => {
                     ev.stopPropagation();
                     this._handleTEventClick(event,ev.target as HTMLElement);
+                   
                 });
                 eventDiv.className = 'tyx__week-grid__day-event';
 
                 const eventMetadata = EventUtils.getEventMetadata(event,
-                     date,
+                    startHourOfDay,
                      tyxCalendarWeekGridHeight,
-                     timeSlotInterval, slotHeight, this.timezone,
+                     timeSlotInterval, 
+                     slotHeight, 
+                     this.timezone,
                      this.language,
                 );
+                
                 eventDiv.style.top = `${eventMetadata.eventStartPercentage}%`;
                 eventDiv.style.height = `${eventMetadata.eventHeightPercentage}%`;
 
@@ -420,7 +431,7 @@ export class TimelyX {
                     const singleEventW = 100/(collisions.length+1);
                     const shiftW = singleEventW*(position);
                     eventDiv.style.marginLeft = `calc(${(shiftW)}%)`;
-                    eventDiv.style.width = `calc(${(100- shiftW)}%)`;
+                    eventDiv.style.width = `calc(${(100 - shiftW)}%)`;
                     eventDiv.style.zIndex = `${i +1}`
                     eventDiv.classList.add('position-'+position);
                 }
@@ -437,6 +448,20 @@ export class TimelyX {
                 eventTitleDiv.classList.add('tyx__week-grid__day-event-title')
                 eventTitleDiv.innerText = `${event.title}`
                 eventDiv.appendChild(eventTitleDiv)
+                // observe this event div since it is now in the DOM
+                setTimeout(() => {
+                    new Resizer().listen(eventDiv,this.tyxWeekOption.timeSlotHeight!,(e:any) => {
+                        const start =  DateTime.fromISO(event.start_date).setZone(this.timezone).setLocale(this.language);
+                        const end =  DateTime.fromISO(event.end_date).setZone(this.timezone).setLocale(this.language);
+                        const eventDuration = end.diff(start,'minutes');
+                        const newEnd = end.plus({minutes: eventDuration.as('minutes') * e.percentH/100});
+                        event.end_date = newEnd.toUTC().toISO();
+                        this.onTEventUpdated?.call(this,event);
+                        this.closeModal();
+                    });
+                   // new VerticalDragger().listen(eventDiv);
+                },200)
+              
 
                 const eventTimesDiv = document.createElement('div')
                 eventTimesDiv.classList.add('tyx__week-grid__day-event-time')
@@ -612,6 +637,7 @@ export class TimelyX {
                 eventItem.addEventListener('click', (ev)=>{
                     ev.stopPropagation();
                     this._handleTEventClick(event,ev.target as HTMLElement);
+
                 });
                 const eventDetails = document.createElement('div');
                 eventDetails.className = 'event-details';
@@ -706,8 +732,8 @@ export class TimelyX {
         // Push the adjusted event for the current day
         events[eventDate].push({
             ...event,
-            start_date: eventStart.toISO(),  // Adjusted start date for this segment
-            end_date: eventEnd.toISO()       // Adjusted end date for this segment
+            start_date: eventStart.toUTC().toISO(),  // Adjusted start date for this segment
+            end_date: eventEnd.toUTC().toISO(),       // Adjusted end date for this segment
         });
 
         // Sort events by start_date after adding the new event

@@ -13,7 +13,7 @@ export class EventUtils{
                 .join('');
     }
     static getEventMetadata(event:TyxEvent,
-        date:DateTime,
+        startDateOfDay:DateTime,
         tyxCalendarWeekGridHeight: number, 
         timeSlotInterval: Duration,
         slotHeight: number,
@@ -23,7 +23,7 @@ export class EventUtils{
         const end = DateTime.fromISO(event.end_date).setZone(timezone).setLocale(language);
 
         // compute percentage from the top of the column, event will be displayed by absolute to value
-        const totalMinutesStart = start.diff(date.startOf("day"),'minutes').minutes;
+        const totalMinutesStart = start.diff(startDateOfDay,'minutes').minutes;
         const numberOfSlotsForEventStart = (totalMinutesStart / (timeSlotInterval.as("minutes")));
         const eventYPosition = slotHeight * numberOfSlotsForEventStart; 
         const eventHeight = slotHeight * (end.diff(start,'minutes').minutes / (timeSlotInterval.as("minutes")));
@@ -35,7 +35,9 @@ export class EventUtils{
             eventHeightPercentage,
             eventEndPercentage,
             start,
-            end
+            end,
+            "start_date":event.start_date,
+            "end_date":event.end_date,
         }
     }
     protected  static  getRandomInt = (min:any, max:any)=> {

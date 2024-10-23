@@ -2,9 +2,8 @@ import { TimelyX,EventUtils } from './src';
 
 
 const calendar = new TimelyX({
-    timezone:"America/New_York",
     language:"en-US",
-    view:'month',
+    view:'week',
     handleEvents:true,
     tHeaderOption:{
         currentMonthFormat:"MMMM yyyy",
@@ -12,8 +11,8 @@ const calendar = new TimelyX({
     },
     tyxWeekOption:{
         timeSlotInterval:30,
-        startHourOfDay:4,
-        endHourOfDay:22,
+         startHourOfDay:3,
+        // endHourOfDay:22,
         timeSlotHeight:90
     }
 });

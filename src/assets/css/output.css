@@ -661,6 +661,7 @@ video {
   transition: all 0.3s;
   overflow: hidden;
   border-left-width: 5px;
+  resize: vertical;
 }
 
 .tyx__week-grid .tyx__week-grid__day .tyx__week-grid__day-event:hover{
@@ -668,7 +669,7 @@ video {
   overflow: scroll;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
   width: calc(100%)!important;
-  min-height: 100px;
+  /* min-height: 100px; */
 }
 
 .tyx__week-grid .tyx__week-grid__day .tyx__week-grid__day-event .tyx__week-grid__day-event-title{
