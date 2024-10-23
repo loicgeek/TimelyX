@@ -1,3 +1,4 @@
+import { PluginHelper } from "./plugin_helper";
 
 
 export class Resizer {
@@ -37,16 +38,21 @@ export class Resizer {
 
     // Prevent click propagation during resizing
     element.addEventListener('mousedown', (event) => {
-        this.isResizing = true;
-    event.stopPropagation();  // Prevent click propagation
-        if (this.currentCorner) {
-            event.stopPropagation();  // Prevent click propagation
-            event.preventDefault();   // Prevent default behavior (e.g., text selection)
-        }
+         this.currentCorner = PluginHelper.detectCorner(event, element);
+         if(this.currentCorner){
+            this.isResizing = true;
+         }
+         
+        
+       // event.stopPropagation();  // Prevent click propagation
+        // if (this.currentCorner) {
+        //     event.stopPropagation();  // Prevent click propagation
+        //     event.preventDefault();   // Prevent default behavior (e.g., text selection)
+        // }
     });
 
-    document.addEventListener('mouseup', (_) => {
-        
+    document.addEventListener('mouseup', (event) => {
+        element.style.cursor = 'default';
        if(this.isResizing && (widthChangePercentage!=0 || heightChangePercentage!=0)){
         this.isResizing =false;
         onSizedChangePercentage({

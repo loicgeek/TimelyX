@@ -459,7 +459,18 @@ export class TimelyX {
                         this.onTEventUpdated?.call(this,event);
                         this.closeModal();
                     });
-                   // new VerticalDragger().listen(eventDiv);
+                    new VerticalDragger().listen(eventDiv,(e:any)=>{
+                        const start =  DateTime.fromISO(event.start_date).setZone(this.timezone).setLocale(this.language);
+                        const end =  DateTime.fromISO(event.end_date).setZone(this.timezone).setLocale(this.language);
+                        const eventDuration = end.diff(start,'minutes');
+                        const newStart= start.plus({minutes: eventDuration.as('minutes') * e.ty/100});
+                        const newEnd = end.plus({minutes: eventDuration.as('minutes') * e.ty/100});
+                        event.start_date = newStart.toUTC().toISO();
+                        event.end_date = newEnd.toUTC().toISO();
+                        this.onTEventUpdated?.call(this,event);
+                        this.closeModal();
+                        
+                    });
                 },200)
               
 

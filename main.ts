@@ -128,5 +128,9 @@ calendar.onTEventClicked = (event:any) => {
 calendar.onBordersChanged = (start:any,end:any) => {
   //  console.log(start, end);
 }
+calendar.onTEventUpdated = (event)=>{
+    console.log("onTEventUpdated",event);
+    
+}
 
 
