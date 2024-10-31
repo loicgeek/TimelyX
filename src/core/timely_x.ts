@@ -8,9 +8,12 @@ import { TyxWeekOption } from './types/tyx_week_option';
 import "../assets/css/output.css"
 import { TyxView } from './types/tyx_view';
 import { Resizer } from './plugins/resizer';
-import { VerticalDragger } from './plugins/vertical_dragger';
+//import { VerticalDragger } from './plugins/vertical_dragger';
 
 
+interface CalendarSettings{
+    smallView?:boolean
+}
 
 export class TimelyX {
     protected resizer: Resizer;
@@ -28,6 +31,8 @@ export class TimelyX {
     private tHeaderOption: TyxHeaderOption;
     private tyxWeekOption: TyxWeekOption;
     private handleEvents:boolean;
+
+    private settings?:CalendarSettings;
     isMobile = window.matchMedia("(max-width: 600px)").matches;
     onDayClicked?: (date: DateTime, events: TyxEvent[]) => void;
     onTEventClicked?: (event: TyxEvent) => void;
@@ -48,6 +53,8 @@ export class TimelyX {
         } as TyxWeekOption,
         handleEvents = false,
         disableDefaultEventClick =false,
+        settings = {} as CalendarSettings,
+        
     } = {}) {
         this.timezone = timezone;
         this.language = language;
@@ -75,19 +82,29 @@ export class TimelyX {
         this.daysOfWeek = this._getDayHeaders();
         this.disableDefaultEventClick = disableDefaultEventClick;
         this.resizer = new Resizer();
-        
+
+        this.settings ={
+            smallView:settings.smallView,
+            ...settings,
+        };
     }
 
     private adjustGridClass() {
         const calendarElement = document.querySelector('.calendar');        
-        if (window.innerWidth <= 600) {
+        if(this.settings?.smallView===true){
             this.isMobile = true;
             calendarElement?.classList.add('small-grid');
             calendarElement?.classList.remove('large-grid');
-        } else {
-            this.isMobile = false;
-            calendarElement?.classList.add('large-grid');
-            calendarElement?.classList.remove('small-grid');
+        }else{
+            if (window.innerWidth <= 600) {
+                this.isMobile = true;
+                calendarElement?.classList.add('small-grid');
+                calendarElement?.classList.remove('large-grid');
+            } else {
+                this.isMobile = false;
+                calendarElement?.classList.add('large-grid');
+                calendarElement?.classList.remove('small-grid');
+            }
         }
     }
 
@@ -96,7 +113,7 @@ export class TimelyX {
         this.instance.classList.add("calendar");
         this._render();
 
-    // Listen for window resize
+        // Listen for window resize
         window.addEventListener('resize', this.adjustGridClass);
         this.adjustGridClass();
     }
@@ -398,7 +415,7 @@ export class TimelyX {
                 eventDiv.className = 'tyx__week-grid__day-event';
 
                 const eventMetadata = EventUtils.getEventMetadata(event,
-                    startHourOfDay,
+                     startHourOfDay,
                      tyxCalendarWeekGridHeight,
                      timeSlotInterval, 
                      slotHeight, 
@@ -456,21 +473,55 @@ export class TimelyX {
                         const eventDuration = end.diff(start,'minutes');
                         const newEnd = end.plus({minutes: eventDuration.as('minutes') * e.percentH/100});
                         event.end_date = newEnd.toUTC().toISO();
+                        console.log(` old:${start.toFormat('HH:mm')} - ${end.toFormat('HH:mm')} new:${start.toFormat('HH:mm')} - ${newEnd.toFormat('HH:mm')}`);
                         this.onTEventUpdated?.call(this,event);
                         this.closeModal();
                     });
-                    new VerticalDragger().listen(eventDiv,(e:any)=>{
-                        const start =  DateTime.fromISO(event.start_date).setZone(this.timezone).setLocale(this.language);
-                        const end =  DateTime.fromISO(event.end_date).setZone(this.timezone).setLocale(this.language);
-                        const eventDuration = end.diff(start,'minutes');
-                        const newStart= start.plus({minutes: eventDuration.as('minutes') * e.ty/100});
-                        const newEnd = end.plus({minutes: eventDuration.as('minutes') * e.ty/100});
-                        event.start_date = newStart.toUTC().toISO();
-                        event.end_date = newEnd.toUTC().toISO();
-                        this.onTEventUpdated?.call(this,event);
-                        this.closeModal();
+                    // new VerticalDragger().listen(eventDiv,tyxCalendarWeekGridHeight,(e:any)=>{
+                       
                         
-                    });
+                    //     const start =  DateTime.fromISO(event.start_date).setZone(this.timezone).setLocale(this.language);
+                    //     const end =  DateTime.fromISO(event.end_date).setZone(this.timezone).setLocale(this.language);
+                    //     const eventDuration = end.diff(start,'minutes');
+                    //     console.log(e);
+                    //     console.log("start",start.toUTC().toISO());
+
+                    //     const onePercentInMinutes = tyxCalendarWeekGridHeight / 100 / timeSlotInterval.as('minutes');
+                    //     console.log("onePercentInMinutes",onePercentInMinutes);
+
+                    //     const targetPercentage = e.newTy
+                    //     const targetDuration = totalDuration.as('minutes') * (targetPercentage / 100);
+                        
+
+                    //     const newStart= startHourOfDay.plus({minutes:targetDuration});
+                    //     const newEnd = end.plus({minutes: eventDuration.as('minutes') * e.ty/100});
+
+                    //     console.log("0%",EventUtils.getEventTimeFromPercentage(
+                    //         targetPercentage,
+                    //         startHourOfDay,
+                    //         tyxCalendarWeekGridHeight,
+                    //         timeSlotInterval, 
+                    //         slotHeight, 
+                           
+                    //    ).toUTC().toISO(),startHourOfDay.toUTC().toISO());
+                        
+                    //     EventUtils.getEventTimeFromPercentage(
+                    //         targetPercentage,
+                    //         startHourOfDay,
+                    //         tyxCalendarWeekGridHeight,
+                    //         timeSlotInterval, 
+                    //         slotHeight, 
+                           
+                    //    );
+
+
+                        
+                    //     event.start_date = newStart.toUTC().toISO();
+                    //     event.end_date = newEnd.toUTC().toISO();
+                    //     this.onTEventUpdated?.call(this,event);
+                    //     this.closeModal();
+                        
+                    // });
                 },200)
               
 
@@ -619,10 +670,13 @@ export class TimelyX {
         }
     }
     private _handleTEventClick(event:TyxEvent, target:HTMLElement) {
-        if(!this.disableDefaultEventClick){
+        
+        if(this.isMobile && this.view=="month"){
+            return
+        }
+        if(!this.disableDefaultEventClick ){
             this.closeModal();
             this.showEventModal(event,target);
-
         }
 
         this.onTEventClicked?.call(this,event);
@@ -646,9 +700,10 @@ export class TimelyX {
                 // end
                 eventItem.className = 'event-item';
                 eventItem.addEventListener('click', (ev)=>{
-                    ev.stopPropagation();
+                    if(!(this.isMobile && this.view=="month")){
+                        ev.stopPropagation();
+                    }
                     this._handleTEventClick(event,ev.target as HTMLElement);
-
                 });
                 const eventDetails = document.createElement('div');
                 eventDetails.className = 'event-details';

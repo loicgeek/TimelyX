@@ -109,6 +109,10 @@ body {
     height: 100%;   /* Grid takes up the full available height */
     border-top: 1px solid #ddd;
 }
+
+/* .calendar.small-grid.non-responsive{
+    max-width: ;
+} */
 .calendar.small-grid .calendar-grid .month-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
@@ -306,23 +310,22 @@ body {
   }
 
 /* Responsive styles */
-@media (max-width: 600px) {
-    .date-cell{
+    .calendar.small-grid .date-cell{
         min-height: 53px; /* Set minimum height for consistency */
     }
     
 
 
     /* Design for event list */
-    .event-list-large{
+    .calendar.small-grid .event-list-large{
         display: flex;
         gap: 2px;
         justify-content: center;
     }
-    .event-list-large .event-details{
+    .calendar.small-grid .event-list-large .event-details{
         display: none;
     }
-    .event-list-large .event-marker{
+    .calendar.small-grid .event-list-large .event-marker{
         background-color: var(--tyx-primary-color);
         height: 5px;
         width: 5px;
@@ -330,7 +333,7 @@ body {
     }
 
 
-    .event-list {
+    .calendar.small-grid .event-list {
         display: flex;
         flex-direction: column;
         gap: 10px; /* Space between events */
@@ -342,13 +345,13 @@ body {
     }
     
     /* Title of each event */
-    .event-list .event-item .event-title {
+    .calendar.small-grid .event-list .event-item .event-title {
         font-size: 15px;
         font-weight: bold;
         margin-bottom: 5px;
     }
      /* Individual event item styles */
-     .event-list .event-item {
+     .calendar.small-grid .event-list .event-item {
          padding: 10px;
          color: #ffffff; /* White text */
          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -357,7 +360,7 @@ body {
      }
     
      /* Event time information */
-     .event-list .event-item .event-time {
+     .calendar.small-grid .event-list .event-item .event-time {
         display: none;
          font-size: 12px;
          display: flex;
@@ -365,11 +368,9 @@ body {
      }
     
      /* Icon styles */
-     .event-list .event-item .event-time::before {
+     .calendar.small-grid .event-list .event-item .event-time::before {
          content: "⏰"; /* Optional: Add an icon similar to the one in the screenshot */
          margin-right: 5px;
      }
 
     /* Container for the event list */
-
-}

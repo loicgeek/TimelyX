@@ -40,6 +40,30 @@ export class EventUtils{
             "end_date":event.end_date,
         }
     }
+     static getEventTimeFromPercentage(
+      startPercentage: number, 
+      startDateOfDay: DateTime, 
+      tyxCalendarWeekGridHeight: number, 
+      timeSlotInterval: Duration, 
+      slotHeight: number
+  ) {
+      // Calculate the total number of time slots that can fit in the grid height
+     // const totalSlots = tyxCalendarWeekGridHeight / slotHeight;
+      
+      // Convert the start percentage into the position in pixels
+      const eventYPosition = (startPercentage / 100) * tyxCalendarWeekGridHeight;
+      
+      // Convert pixels back to the number of time slots
+      const numberOfSlotsForEventStart = eventYPosition / slotHeight;
+      
+      // Calculate the total time in minutes from the start of the day
+      const totalMinutesStart = numberOfSlotsForEventStart * timeSlotInterval.as('minutes');
+      
+      // Get the event's actual start time by adding the minutes to the start of the day
+      const eventStartTime = startDateOfDay.plus({ minutes: totalMinutesStart });
+      
+      return eventStartTime;
+  }
     protected  static  getRandomInt = (min:any, max:any)=> {
         return Math.floor(Math.random() * (max - min)) + min;
       }
