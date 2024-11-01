@@ -13,6 +13,7 @@ import { Resizer } from './plugins/resizer';
 
 interface CalendarSettings{
     smallView?:boolean
+    handleEvents?:boolean
 }
 
 export class TimelyX {
@@ -30,7 +31,6 @@ export class TimelyX {
     private view: TyxView; // Current view
     private tHeaderOption: TyxHeaderOption;
     private tyxWeekOption: TyxWeekOption;
-    private handleEvents:boolean;
 
     private settings?:CalendarSettings;
     isMobile = window.matchMedia("(max-width: 600px)").matches;
@@ -51,14 +51,12 @@ export class TimelyX {
         tyxWeekOption = {
            
         } as TyxWeekOption,
-        handleEvents = false,
         disableDefaultEventClick =false,
         settings = {} as CalendarSettings,
         
     } = {}) {
         this.timezone = timezone;
         this.language = language;
-        this.handleEvents = handleEvents;
         
         this.events = {};
         this.eventInstances = {};
@@ -84,18 +82,20 @@ export class TimelyX {
         this.resizer = new Resizer();
 
         this.settings ={
+            handleEvents:settings.handleEvents??true,
             smallView:settings.smallView,
             ...settings,
         };
     }
 
     private adjustGridClass() {
-        const calendarElement = document.querySelector('.calendar');        
+        const calendarElement = document.querySelector('.calendar');   
+
         if(this.settings?.smallView===true){
             this.isMobile = true;
             calendarElement?.classList.add('small-grid');
             calendarElement?.classList.remove('large-grid');
-        }else{
+        }else{            
             if (window.innerWidth <= 600) {
                 this.isMobile = true;
                 calendarElement?.classList.add('small-grid');
@@ -114,7 +114,9 @@ export class TimelyX {
         this._render();
 
         // Listen for window resize
-        window.addEventListener('resize', this.adjustGridClass);
+        window.addEventListener('resize', () => {
+            this.adjustGridClass()
+        });
         this.adjustGridClass();
     }
     changeViewType(view: TyxView){
@@ -255,7 +257,7 @@ export class TimelyX {
     }
 
     private _renderEventLists() {
-        if(this.view!="month" || this.handleEvents==false) return
+        if(this.view!="month" || this.settings?.handleEvents==false) return
              //append events list view
         const eventListDiv = document.querySelector('.event-list') as HTMLElement || document.createElement('div');
         eventListDiv.innerHTML = '';
@@ -571,7 +573,7 @@ export class TimelyX {
         const dateElement = document.createElement('div');
         dateElement.innerText = date ? date.day.toString() : '';
         dateCell.appendChild(dateElement);
-        if(this.handleEvents){
+        if(this.settings?.handleEvents==true){
             this._populateEventDetails(date, dateCell);
         }
         

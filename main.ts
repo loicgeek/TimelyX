@@ -5,23 +5,35 @@ const calendar = new TimelyX({
     language:"en-US",
     view:'month',
    // timezone:"UTC+1",
-    handleEvents:true,
     tHeaderOption:{
         currentMonthFormat:"MMMM yyyy",
         dayFormat:"ccc"
     },
     tyxWeekOption:{
         timeSlotInterval:30,
-       //  startHourOfDay:3,
-        // endHourOfDay:22,
         timeSlotHeight:90
     },
+
     settings:{
-        // smallView:true
+        //  smallView:true,
+        //  handleEvents:false,
     }
 });
 
 calendar.mount("#timely-calendar");
+calendar.onDayClicked = (date:any, events:any) => {
+    console.log(date.toISO(), events);
+}
+calendar.onTEventClicked = (event:any) => {
+   // console.log(event);
+}
+calendar.onBordersChanged = (start:any,end:any) => {
+  //  console.log(start, end);
+}
+calendar.onTEventUpdated = (event)=>{
+    console.log("onTEventUpdated",event);
+    
+}
 
 // setTimeout(() => {
 //     calendar.changeViewType('month');
@@ -123,18 +135,6 @@ for (let i = 0; i < eventsGenerated.length; i++) {
 
 
 
-calendar.onDayClicked = (date:any, events:any) => {
-   // console.log(date, events);
-}
-calendar.onTEventClicked = (event:any) => {
-   // console.log(event);
-}
-calendar.onBordersChanged = (start:any,end:any) => {
-  //  console.log(start, end);
-}
-calendar.onTEventUpdated = (event)=>{
-    console.log("onTEventUpdated",event);
-    
-}
+
 
 
