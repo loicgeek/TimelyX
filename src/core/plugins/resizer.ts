@@ -14,7 +14,7 @@ export class Resizer {
 
 
 
-    listen(element: HTMLElement,timeSlotHeight:number, onSizedChangePercentage: (e: {}) => void,) {
+    listen(element: HTMLElement, onSizedChangePercentage: (e: {}) => void,) {
        // Store the initial width and height
     const targetRect = element.getBoundingClientRect();
     const originalWidth = targetRect.width;
@@ -51,7 +51,7 @@ export class Resizer {
         // }
     });
 
-    document.addEventListener('mouseup', (event) => {
+    document.addEventListener('mouseup', (_) => {
         element.style.cursor = 'default';
        if(this.isResizing && (widthChangePercentage!=0 || heightChangePercentage!=0)){
         this.isResizing =false;

@@ -13,10 +13,9 @@ const calendar = new TimelyX({
         timeSlotInterval:30,
         timeSlotHeight:90
     },
-
     settings:{
-        //  smallView:true,
-        //  handleEvents:false,
+         smallView:true,
+         handleEvents:false,
     }
 });
 

@@ -469,7 +469,7 @@ export class TimelyX {
                 eventDiv.appendChild(eventTitleDiv)
                 // observe this event div since it is now in the DOM
                 setTimeout(() => {
-                    new Resizer().listen(eventDiv,this.tyxWeekOption.timeSlotHeight!,(e:any) => {
+                    new Resizer().listen(eventDiv,(e:any) => {
                         const start =  DateTime.fromISO(event.start_date).setZone(this.timezone).setLocale(this.language);
                         const end =  DateTime.fromISO(event.end_date).setZone(this.timezone).setLocale(this.language);
                         const eventDuration = end.diff(start,'minutes');
@@ -945,7 +945,7 @@ export class TimelyX {
         }, 10); // Small delay to ensure the modal is properly positioned
       
         // Close modal when clicking outside of the modal content
-        modalOverlay.addEventListener('click', (event) => {
+        modalOverlay.addEventListener('click', (_) => {
             this.closeModal();
         });
       }
